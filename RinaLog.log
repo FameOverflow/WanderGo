@@ -1,0 +1,4 @@
+[Debug] -2023/12/03 17:18:27 authn.go:43: Key: 'User.UserName' Error:Field validation for 'UserName' failed on the 'required' tag
+[Debug] -2023/12/03 18:38:43 handlers.go:225: Key: 'UserForgotten.NewPwd' Error:Field validation for 'NewPwd' failed on the 'required' tag
+[Debug] -2023/12/04 09:16:45 avatar.go:23: http: no such file
+[Debug] -2023/12/04 11:02:37 email.go:23: no multipart boundary param in Content-Type
