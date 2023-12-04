@@ -44,7 +44,7 @@ func SendEmail(ctx *gin.Context) {
 	msg.SetHeader("To", tu.UserAccount)
 	msg.SetHeader("Subject", "您的漫GO验证码")
 	msg.SetBody("text/html", "<h3>您的漫GO验证码为</h3><p>"+randNum+"<p>")
-	dialer := mailer.NewDialer("smtp.163.com", 465, "m19870110195@163.com", "NMNMIOJXWOGJJJJL")
+	dialer := mailer.NewDialer("smtp.163.com", 465, "m19870110195@163.com", "NMNMIOJXWOGJJJJL") //这个授权码随便用，刚创的
 	if err := dialer.DialAndSend(msg); err != nil {
 		log.Println(err)
 		return

@@ -5,8 +5,8 @@ import (
 )
 
 type Address struct {
-	x float64
-	y float64
+	X float64
+	Y float64
 }
 type User struct {
 	gorm.Model
@@ -15,7 +15,7 @@ type User struct {
 	UserPassword string `gorm:"not null" json:"user_password" binding:"required`
 	UserCaptcha  int    `gorm:"-" json:"user_captcha" binding:"required`
 }
-type Photo struct { //前端传图时带上图片类型，是avatar还是photo
+type Photo struct {
 	gorm.Model
 	UserAccount string `gorm:"not null;index" json:"user_account" binding:"required`
 	PhotoData   []byte `gorm:"not null" json:"photo_data"`
