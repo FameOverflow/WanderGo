@@ -14,6 +14,7 @@ type User struct {
 	UserAccount  string `gorm:"not null;index" json:"user_account" binding:"required`
 	UserPassword string `gorm:"not null" json:"user_password" binding:"required`
 	UserCaptcha  int    `gorm:"-" json:"user_captcha" binding:"required`
+	Comments     []Comment
 }
 type Photo struct {
 	gorm.Model
@@ -39,7 +40,9 @@ type Comment struct {
 type Place struct {
 	gorm.Model
 	PlaceName        string  ``
-	PlaceId          int     ``
+	PlaceID          int     ``
 	TopLeftPoint     Address ``
 	BottomRightPoint Address ``
+	CenterPoint      Address ``
+	Comments         []Comment
 }

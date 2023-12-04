@@ -14,6 +14,7 @@ func Start() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("ruleOfPwd", au.RuleOfPwd)
 	}
+	//暂未分组
 	engine := gin.Default()
 	engine.Use(mid.Cors())
 	engine.POST("/GetCaptcha", au.SendEmail)

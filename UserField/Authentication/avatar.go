@@ -55,3 +55,17 @@ func AvatarChange(ctx *gin.Context) {
 	dbf.GLOBAL_DB.Model(&dbf.Avatar{}).Where("user_name = ?", ava.UserAccount).Select("image_data").Updates(dbf.Avatar{AvatarData: ava.AvatarData})
 	ctx.JSON(http.StatusOK, gin.H{"message": "换上新头像了！"})
 }
+func SendAvatarToFrontend(ctx *gin.Context) {
+	var avatar dbf.Avatar
+	userAccount := SearchAccount(ctx)
+	err := dbf.GLOBAL_DB.Where("user_account = ?", userAccount).First(&avatar).Error
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "未找到用户头像"})
+		return
+	}
+	// 将头像数据发送给前端
+	ctx.Data(http.StatusOK, "image/jpeg", avatar.AvatarData)
+	ctx.JSON(http.StatusOK, gin.H{
+		"avatar_id": avatar.AvatarID,
+	})
+}
