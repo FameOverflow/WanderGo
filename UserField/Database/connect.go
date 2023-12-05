@@ -47,6 +47,13 @@ func ConnectToDb() {
 			return
 		}
 	}
+	if (!GLOBAL_DB.Migrator().HasTable(&Place{})) {
+		err := GLOBAL_DB.AutoMigrate(&Place{})
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
 	if (!GLOBAL_DB.Migrator().HasTable(&Comment{})) {
 		err := GLOBAL_DB.AutoMigrate(&Comment{})
 		if err != nil {
@@ -54,5 +61,36 @@ func ConnectToDb() {
 			return
 		}
 	}
-
+	// GLOBAL_DB.Model(&Place{}).Create(&Place{
+	// 	PlaceName: "慧源楼",
+	// 	PlaceUID:  0,
+	// 	TopLeftPoint: Address{
+	// 		X: -30,
+	// 		Y: 30,
+	// 	},
+	// 	BottomRightPoint: Address{
+	// 		X: 30,
+	// 		Y: -30,
+	// 	},
+	// 	CenterPoint: Address{
+	// 		X: 0,
+	// 		Y: 0,
+	// 	},
+	// })
+	// GLOBAL_DB.Model(&Place{}).Create(&Place{
+	// 	PlaceName: "一食堂",
+	// 	PlaceUID:  1,
+	// 	TopLeftPoint: Address{
+	// 		X: -50,
+	// 		Y: 5,
+	// 	},
+	// 	BottomRightPoint: Address{
+	// 		X: -40,
+	// 		Y: -5,
+	// 	},
+	// 	CenterPoint: Address{
+	// 		X: -45,
+	// 		Y: 0,
+	// 	},
+	// })
 }

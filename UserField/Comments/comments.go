@@ -1,9 +1,13 @@
 package Comment
 
 import (
+	au "SparkForge/Authentication"
 	dbf "SparkForge/Database"
+	pos "SparkForge/Position"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,10 +19,23 @@ func AddComment(ctx *gin.Context) {
 		log.Println(err)
 		return
 	}
+	centerPoint := pos.PositionHandlerComment(com.Position)
+	place := pos.GetPos(centerPoint)
+	com.UserAccount = au.SearchAccount(ctx)
+	user := au.GetUser(com.UserAccount)
+	com.User = user
+	com.Place = place
+	currentTime := strconv.FormatInt(com.CreatedAt.Unix(), 10)
+	com.CommentUID = au.EncryptMd5(user.UserAccount + currentTime)
 	if com.Sentence != "" || com.PhotoData != nil {
-		dbf.GLOBAL_DB.Model(&dbf.Comment{}).Create(&com)
+		err := dbf.GLOBAL_DB.Model(&dbf.Comment{}).Create(&com).Error
+		if err != nil {
+			log.Println(err)
+			return
+		}
 		ctx.JSON(http.StatusOK, gin.H{
-			"message": "添加评论成功",
+			"message":   "添加评论成功",
+			"离你最近的中心点为": centerPoint,
 		})
 	}
 }
@@ -37,4 +54,12 @@ func GetPlaceWithComments(placeID uint) (dbf.Place, error) {
 		return dbf.Place{}, err
 	}
 	return place, nil
+}
+func TestComments(ctx *gin.Context) {
+	// var com dbf.User
+	// dbf.GLOBAL_DB.Preload("Comments").Take(&com)
+	// fmt.Println(com)
+	var p dbf.Place
+	dbf.GLOBAL_DB.Preload("Comments").Take(&p)
+	fmt.Println(p)
 }

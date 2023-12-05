@@ -3,11 +3,11 @@ package main
 import (
 	dbf "SparkForge/Database"
 	l "SparkForge/Log"
-	svr "SparkForge/Server"
+	rou "SparkForge/Routes"
 )
 
 func main() {
 	l.InitLogging()
 	dbf.ConnectToDb()
-	svr.Start()
+	rou.Start()
 }

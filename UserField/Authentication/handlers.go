@@ -86,6 +86,15 @@ func SearchAccount(ctx *gin.Context) string {
 	return myClaims.Account
 
 }
+func GetUser(a string) dbf.User {
+	var u dbf.User
+	err := dbf.GLOBAL_DB.Model(&dbf.User{}).Where("user_account = ?", a).First(&u).Error
+	if err != nil {
+		log.Panicln(err)
+		return u
+	}
+	return u
+}
 
 // 验证器验证注册时账号是否符合规范
 func RuleOfAc(fl validator.FieldLevel) bool {

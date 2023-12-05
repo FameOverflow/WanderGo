@@ -1,9 +1,10 @@
-package Server
+package Routes
 
 import (
 	au "SparkForge/Authentication"
 	com "SparkForge/Comments"
 	mid "SparkForge/MiddleWare"
+	pos "SparkForge/Position"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -21,12 +22,14 @@ func Start() {
 	engine.POST("/Register", au.RegisterHandler)
 	engine.POST("/Login", au.LoginHandler)
 	engine.POST("/Exit", au.ExitHandler)
-	engine.POST("/ChangeName", mid.LoginOrNot(), au.ChangeNameHandler)
-	engine.POST("/ChangePwd", mid.LoginOrNot(), au.ChangePwdHandler)
+	engine.POST("/ChangeName", mid.LoginVerification(), au.ChangeNameHandler)
+	engine.POST("/ChangePwd", mid.LoginVerification(), au.ChangePwdHandler)
 	engine.POST("/ForgetPwdPre", au.ForgotPasswordGetCaptcha)
 	engine.POST("/ForgetPwd", au.ForgotPassword)
-	engine.POST("/AvatarUpload", mid.LoginOrNot(), au.AvatarUpload)
-	engine.POST("AvatarChange", mid.LoginOrNot(), au.AvatarChange)
-	engine.POST("AddComment", com.AddComment)
+	engine.POST("/AvatarUpload", mid.LoginVerification(), au.AvatarUpload)
+	engine.POST("/AvatarChange", mid.LoginVerification(), au.AvatarChange)
+	engine.POST("/AddComment", mid.LoginVerification(), com.AddComment)
+	engine.POST("/Roaming", mid.LoginVerification(), pos.Roaming)
+	engine.POST("/test", com.TestComments)
 	engine.Run(":8080")
 }
