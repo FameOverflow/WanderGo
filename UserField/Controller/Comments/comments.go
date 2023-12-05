@@ -2,8 +2,8 @@ package Comment
 
 import (
 	au "SparkForge/Authentication"
-	dbf "SparkForge/Database"
-	pos "SparkForge/Position"
+	con "SparkForge/Config"
+	pos "SparkForge/Controller/Position"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,8 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AddComment(ctx *gin.Context) {
-	var com dbf.Comment
+func PostComment(ctx *gin.Context) {
+	var com con.Comment
 	err := ctx.ShouldBind(&com)
 	if err != nil {
 		log.Println(err)
@@ -28,7 +28,7 @@ func AddComment(ctx *gin.Context) {
 	currentTime := strconv.FormatInt(com.CreatedAt.Unix(), 10)
 	com.CommentUID = au.EncryptMd5(user.UserAccount + currentTime)
 	if com.Sentence != "" || com.PhotoData != nil {
-		err := dbf.GLOBAL_DB.Model(&dbf.Comment{}).Create(&com).Error
+		err := con.GLOBAL_DB.Model(&con.Comment{}).Create(&com).Error
 		if err != nil {
 			log.Println(err)
 			return
@@ -39,19 +39,19 @@ func AddComment(ctx *gin.Context) {
 		})
 	}
 }
-func GetAccountWithComments(accountID uint) (dbf.User, error) {
-	var u dbf.User
-	err := dbf.GLOBAL_DB.Preload("Comment").First(&dbf.User{}, accountID).Error
+func GetAccountWithComments(accountID uint) (con.User, error) {
+	var u con.User
+	err := con.GLOBAL_DB.Preload("Comment").First(&con.User{}, accountID).Error
 	if err != nil {
-		return dbf.User{}, err
+		return con.User{}, err
 	}
 	return u, nil
 }
-func GetPlaceWithComments(placeID uint) (dbf.Place, error) {
-	var place dbf.Place
-	err := dbf.GLOBAL_DB.Preload("Comment").First(&place, placeID).Error
+func GetPlaceWithComments(placeID uint) (con.Place, error) {
+	var place con.Place
+	err := con.GLOBAL_DB.Preload("Comment").First(&place, placeID).Error
 	if err != nil {
-		return dbf.Place{}, err
+		return con.Place{}, err
 	}
 	return place, nil
 }
@@ -59,7 +59,7 @@ func TestComments(ctx *gin.Context) {
 	// var com dbf.User
 	// dbf.GLOBAL_DB.Preload("Comments").Take(&com)
 	// fmt.Println(com)
-	var p dbf.Place
-	dbf.GLOBAL_DB.Preload("Comments").Take(&p)
+	var p con.Place
+	con.GLOBAL_DB.Preload("Comments").Take(&p)
 	fmt.Println(p)
 }

@@ -1,4 +1,4 @@
-package Database
+package Config
 
 import (
 	"log"

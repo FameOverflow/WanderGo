@@ -1,10 +1,10 @@
-package Routes
+package Api
 
 import (
 	au "SparkForge/Authentication"
-	com "SparkForge/Comments"
+	com "SparkForge/Controller/Comments"
+	pos "SparkForge/Controller/Position"
 	mid "SparkForge/MiddleWare"
-	pos "SparkForge/Position"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -28,7 +28,7 @@ func Start() {
 	engine.POST("/ForgetPwd", au.ForgotPassword)
 	engine.POST("/AvatarUpload", mid.LoginVerification(), au.AvatarUpload)
 	engine.POST("/AvatarChange", mid.LoginVerification(), au.AvatarChange)
-	engine.POST("/AddComment", mid.LoginVerification(), com.AddComment)
+	engine.POST("/AddComment", mid.LoginVerification(), com.PostComment)
 	engine.POST("/Roaming", mid.LoginVerification(), pos.Roaming)
 	engine.POST("/test", com.TestComments)
 	engine.Run(":8080")

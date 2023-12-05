@@ -1,7 +1,7 @@
 package Authentication
 
 import (
-	dbf "SparkForge/Database"
+	con "SparkForge/Config"
 	"io"
 	"log"
 	"net/http"
@@ -10,7 +10,7 @@ import (
 )
 
 func AvatarUpload(ctx *gin.Context) {
-	var ava dbf.Avatar // 前端传图
+	var ava con.Avatar // 前端传图
 	err := ctx.ShouldBind(&ava)
 	if err != nil {
 		log.Println(err)
@@ -31,11 +31,11 @@ func AvatarUpload(ctx *gin.Context) {
 		return
 	}
 	ava.AvatarData = buffer
-	dbf.GLOBAL_DB.Model(&dbf.Avatar{}).Create(&ava)
+	con.GLOBAL_DB.Model(&con.Avatar{}).Create(&ava)
 	ctx.JSON(http.StatusOK, gin.H{"message": "你有头像了！"})
 }
 func AvatarChange(ctx *gin.Context) {
-	var ava dbf.Avatar // 前端传图
+	var ava con.Avatar // 前端传图
 	err := ctx.ShouldBind(&ava)
 	if err != nil {
 		log.Println(err)
@@ -53,14 +53,14 @@ func AvatarChange(ctx *gin.Context) {
 		log.Println(err)
 		return
 	}
-	dbf.GLOBAL_DB.Model(&dbf.Avatar{}).Where("user_name = ?", ava.UserAccount).Select("image_data").Updates(dbf.Avatar{AvatarData: buffer})
+	con.GLOBAL_DB.Model(&con.Avatar{}).Where("user_name = ?", ava.UserAccount).Select("image_data").Updates(con.Avatar{AvatarData: buffer})
 	ctx.JSON(http.StatusOK, gin.H{"message": "换上新头像了！"})
 }
 
 func SendAvatarToFrontend(ctx *gin.Context) {
-	var avatar dbf.Avatar
+	var avatar con.Avatar
 	userAccount := SearchAccount(ctx)
-	err := dbf.GLOBAL_DB.Where("user_account = ?", userAccount).First(&avatar).Error
+	err := con.GLOBAL_DB.Where("user_account = ?", userAccount).First(&avatar).Error
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"message": "未找到用户头像"})
 		return

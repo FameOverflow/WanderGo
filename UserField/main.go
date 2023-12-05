@@ -1,13 +1,12 @@
 package main
 
 import (
-	dbf "SparkForge/Database"
-	l "SparkForge/Log"
-	rou "SparkForge/Routes"
+	rou "SparkForge/Api"
+	con "SparkForge/Config"
 )
 
 func main() {
-	l.InitLogging()
-	dbf.ConnectToDb()
+	con.InitLogging()
+	con.ConnectToDb()
 	rou.Start()
 }

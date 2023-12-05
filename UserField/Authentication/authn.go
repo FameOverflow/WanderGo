@@ -4,14 +4,14 @@ import (
 	"log"
 	"net/http"
 
-	dbf "SparkForge/Database"
+	con "SparkForge/Config"
 
 	"github.com/gin-gonic/gin"
 )
 
 // 处理前端的注册请求,前端设置一下发送完验证码才能点击注册
 func RegisterHandler(ctx *gin.Context) {
-	var registerAcct dbf.User
+	var registerAcct con.User
 	err := ctx.ShouldBind(&registerAcct)
 	if err != nil { //如果没有填写验证码
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -22,7 +22,7 @@ func RegisterHandler(ctx *gin.Context) {
 	}
 	registerAcct.UserPassword = EncryptMd5(registerAcct.UserPassword)
 	if CompareCaptcha(registerAcct.UserCaptcha) {
-		dbf.GLOBAL_DB.Model(&dbf.User{}).Create(&registerAcct)
+		con.GLOBAL_DB.Model(&con.User{}).Create(&registerAcct)
 		ctx.SetCookie("UserName", EncryptMd5(registerAcct.UserName), 2592000, "/", "localhost", false, true)
 		token := GetToken(registerAcct.UserAccount)
 		ctx.Request.Header.Set("Authorization", "Bearer "+token)
@@ -40,7 +40,7 @@ func RegisterHandler(ctx *gin.Context) {
 
 // 处理前端的登录请求
 func LoginHandler(ctx *gin.Context) {
-	var loginAcct dbf.User
+	var loginAcct con.User
 	err := ctx.ShouldBind(&loginAcct)
 	if err != nil {
 		log.Println(err)

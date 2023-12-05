@@ -1,7 +1,7 @@
 package Authentication
 
 import (
-	dbf "SparkForge/Database"
+	con "SparkForge/Config"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
@@ -27,20 +27,20 @@ func EncryptMd5(pwd string) string {
 	return pwdEncrypt
 }
 func AccountConflictVerification(a string) error { //有错说明不冲突
-	var tUser dbf.User
-	err := dbf.GLOBAL_DB.Model(&dbf.User{}).Where("user_account = ?", a).First(&tUser).Error
+	var tUser con.User
+	err := con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", a).First(&tUser).Error
 	return err
 }
-func UserLoginVerification(u dbf.User) (int, error) {
-	var tUser dbf.User
-	err := dbf.GLOBAL_DB.Model(&dbf.User{}).Where(dbf.User{UserAccount: u.UserAccount}, "user_account").
+func UserLoginVerification(u con.User) (int, error) {
+	var tUser con.User
+	err := con.GLOBAL_DB.Model(&con.User{}).Where(con.User{UserAccount: u.UserAccount}, "user_account").
 		First(&tUser).Error
 	if err != nil {
 		// 输入账号不存在
 		return 1, err
 	} else {
 		// 若账号存在，检测密码是否正确
-		err = dbf.GLOBAL_DB.Model(&dbf.User{}).Where(dbf.User{UserAccount: u.UserAccount, UserPassword: EncryptMd5(u.UserPassword)}, "user_account", "user_password").
+		err = con.GLOBAL_DB.Model(&con.User{}).Where(con.User{UserAccount: u.UserAccount, UserPassword: EncryptMd5(u.UserPassword)}, "user_account", "user_password").
 			First(&tUser).Error
 		if err != nil {
 			// 密码不正确
@@ -86,9 +86,9 @@ func SearchAccount(ctx *gin.Context) string {
 	return myClaims.Account
 
 }
-func GetUser(a string) dbf.User {
-	var u dbf.User
-	err := dbf.GLOBAL_DB.Model(&dbf.User{}).Where("user_account = ?", a).First(&u).Error
+func GetUser(a string) con.User {
+	var u con.User
+	err := con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", a).First(&u).Error
 	if err != nil {
 		log.Panicln(err)
 		return u
@@ -127,7 +127,7 @@ func ChangeNameHandler(ctx *gin.Context) {
 		return
 	}
 	userAcct := SearchAccount(ctx)
-	err = dbf.GLOBAL_DB.Model(&dbf.User{}).Where("user_account = ?", userAcct).Select("user_name").Updates(dbf.User{UserName: nameToBeChanged.UserName}).Error
+	err = con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", userAcct).Select("user_name").Updates(con.User{UserName: nameToBeChanged.UserName}).Error
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "修改用户名失败",
@@ -147,16 +147,16 @@ func ChangePwdHandler(ctx *gin.Context) {
 		log.Println(err)
 		return
 	}
-	var tempUser dbf.User
+	var tempUser con.User
 	userAcct := SearchAccount(ctx)
-	dbf.GLOBAL_DB.Model(&dbf.User{}).Where("user_account = ?").First(&tempUser)
+	con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?").First(&tempUser)
 	if tempUser.UserPassword != passwordChanging.OldPwd {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"message": "输入的旧密码错误",
 		})
 		return
 	}
-	dbf.GLOBAL_DB.Model(&dbf.User{}).Where("user_account = ?", userAcct).Select("user_password").Updates(dbf.User{UserPassword: EncryptMd5(passwordChanging.CurrentPwd)})
+	con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", userAcct).Select("user_password").Updates(con.User{UserPassword: EncryptMd5(passwordChanging.CurrentPwd)})
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "修改密码成功",
 	})
@@ -207,7 +207,7 @@ func ForgotPassword(ctx *gin.Context) {
 		return
 	}
 	if CompareCaptcha(u.UserCaptcha) {
-		dbf.GLOBAL_DB.Model(&dbf.User{}).Where("user_account = ?", u.UserAccount).Select("user_password").Updates(dbf.User{UserPassword: EncryptMd5(u.NewPwd)})
+		con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", u.UserAccount).Select("user_password").Updates(con.User{UserPassword: EncryptMd5(u.NewPwd)})
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "您已成功修改密码,请登录",
 		})
