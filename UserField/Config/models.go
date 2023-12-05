@@ -50,6 +50,8 @@ type Comment struct {
 	Position    Address `gorm:"-" json:"position"`
 	User        User    `gorm:"foreignKey:CommentUID"`
 	Place       Place   `gorm:"foreignKey:CommentUID"`
+	StarCnt     int     `gorm:"default:0" json:"star_cnt"`
+	Stars       []Star  `gorm:"foreignKey:StarID"`
 }
 type Place struct {
 	gorm.Model
@@ -59,4 +61,13 @@ type Place struct {
 	BottomRightPoint Address   `gorm:"TYPE:json" json:"bottom_right_point"`
 	CenterPoint      Address   `gorm:"TYPE:json" json:center_point"`
 	Comments         []Comment `gorm:"foreignKey:CommentUID" json:"comments"`
+	Stars            []Star    `gorm:"foreignKey:StarID"`
+}
+type Star struct {
+	gorm.Model
+	UserAccount string  `json:"user_account"`
+	CommentUID  string  `json:"comment_uid"`
+	StarUID     string  `json:"star_uid"`
+	Comment     Comment `gorm:"foreignKey:StarID"`
+	User        User    `gorm:"foreignKey:StarID"`
 }
