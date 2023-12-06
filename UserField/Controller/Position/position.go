@@ -44,7 +44,7 @@ func PositionHandlerComment(a con.Address) con.Address {
 func Roaming(ctx *gin.Context) {
 	centerPoint := PositionHandler(ctx)
 	var places []con.Place
-	con.GLOBAL_DB.Model(&con.Place{}).Where("POWER(? - JSON_EXTRACT(top_left_point, '$.x'), 2) + POWER(? - JSON_EXTRACT(top_left_point, '$.y'), 2) <= 160000", centerPoint.X, centerPoint.Y).Find(&places)
+	con.GLOBAL_DB.Model(&con.Place{}).Where("POWER(? - JSON_EXTRACT(center_point, '$.x'), 2) + POWER(? - JSON_EXTRACT(center_point, '$.y'), 2) <= 160000", centerPoint.X, centerPoint.Y).Find(&places)
 	randomIndex := rand.Intn(len(places))
 	selectedPlace := places[randomIndex]
 	var pl con.Place
@@ -58,10 +58,11 @@ func Roaming(ctx *gin.Context) {
 	randomCommentIndex := rand.Intn(len(pl.Comments))
 	selectedComment := pl.Comments[randomCommentIndex]
 	ctx.JSON(http.StatusOK, gin.H{
-		"center_point": selectedPlace.CenterPoint,
+		"place_uid":  selectedPlace.PlaceUID,
+		"place_name": selectedPlace.PlaceName,
 	})
 	ctx.JSON(http.StatusOK, gin.H{
-		"sentence": selectedComment.Sentence,
+		"text": selectedComment.Text,
 	})
-
+	ctx.Data(http.StatusOK, "image/jpeg", selectedComment.Photo.PhotoData)
 }

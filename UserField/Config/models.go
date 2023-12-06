@@ -16,44 +16,53 @@ func (p Address) Value() (driver.Value, error) {
 	data, err := json.Marshal(p)
 	return string(data), err
 }
-func (c *Address) Scan(input interface{}) error {
+func (p *Address) Scan(input interface{}) error {
+	return json.Unmarshal(input.([]byte), p)
+}
+func (c *Photo) Value() (driver.Value, error) {
+	data, err := json.Marshal(c)
+	return string(data), err
+}
+func (c *Photo) Scan(input interface{}) error {
 	return json.Unmarshal(input.([]byte), c)
 }
 
 type User struct {
 	gorm.Model
 	UserName     string    `gorm:"not null" json:"user_name"`
-	UserAccount  string    `gorm:"not null;index" json:"user_account" binding:"required`
-	UserPassword string    `gorm:"not null" json:"user_password" binding:"required`
-	UserCaptcha  int       `gorm:"-" json:"user_captcha" binding:"required`
+	UserAccount  string    `gorm:"not null;index" json:"user_account" binding:"required"`
+	UserPassword string    `gorm:"not null" json:"user_password" binding:"required"`
+	UserCaptcha  int       `gorm:"-" json:"user_captcha" binding:"required"`
 	Comments     []Comment `gorm:"foreignKey:CommentUID" json:"comments"`
 	Stars        []Star    `gorm:"foreignKey:StarUID"`
+	Photos       []Photo   `gorm:"foreignKey:PhotoUID"`
 }
 type Photo struct {
 	gorm.Model
-	UserAccount string `gorm:"not null;index" json:"user_account" binding:"required`
+	UserAccount string `gorm:"not null;index" json:"user_account" binding:"required"`
 	PhotoData   []byte `gorm:"not null" json:"photo_data"`
-	PhotoID     string `gorm:"not null;index json:"photo_id binding:"required"`
+	PhotoUID    string `gorm:"not null;index" json:"photo_id" binding:"required"`
+	User        User   `gorm:"foreignKey:PhotoUID"`
 }
 type Avatar struct {
 	gorm.Model
 	UserAccount string `gorm:"not null;index" json:"user_account"`
-	AvatarData  []byte `gorm:"not null" json:"photo_data"`
-	AvatarID    string `gorm:"not null;index json:"photo_id binding:"required"`
+	AvatarData  []byte `gorm:"not null" json:"avatar_data"`
+	AvatarUID   string `gorm:"not null" json:"avatar_uid" binding:"required"`
 }
 type Comment struct {
 	gorm.Model
 	UserAccount string  `gorm:"not null;index" json:"user_account"`
-	Data        string  `gorm:"not null" json:"data"`
-	PhotoID     string  `json:"photo_id"`
-	PhotoData   []byte  `json:"photo_data"`
-	Sentence    string  `json:"sentence"`
-	CommentUID  string  `gorm:"not null" json:"comment_id"`
+	Date        string  `gorm:"not null" json:"date"`
+	PhotoUID    string  `json:"photo_uid"`
+	Text        string  `json:"text"`
+	CommentUID  string  `gorm:"not null" json:"comment_uid"`
 	Position    Address `gorm:"-" json:"position"`
 	User        User    `gorm:"foreignKey:CommentUID"`
 	Place       Place   `gorm:"foreignKey:CommentUID"`
 	StarCnt     int     `gorm:"default:0" json:"star_cnt"`
 	Stars       []Star  `gorm:"foreignKey:StarUID"`
+	Photo       Photo   `gorm:"foreignKey:PhotoUID"`
 }
 type Place struct {
 	gorm.Model

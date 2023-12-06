@@ -28,6 +28,7 @@ func Start() {
 	engine.POST("/ForgetPwd", au.ForgotPassword)
 	engine.POST("/AvatarUpload", mid.LoginVerification(), au.AvatarUpload)
 	engine.POST("/AvatarChange", mid.LoginVerification(), au.AvatarChange)
+	engine.POST("/LoadAvatar", au.SendAvatarToFrontend)
 	engine.POST("/AddComment", mid.LoginVerification(), com.PostComment)
 	engine.POST("/Roaming", mid.LoginVerification(), pos.Roaming)
 	engine.POST("/test", com.TestComments)

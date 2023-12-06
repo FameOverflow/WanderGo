@@ -27,11 +27,11 @@ func PostComment(ctx *gin.Context) {
 	user := au.GetUser(com.UserAccount)
 	com.User = user
 	com.Place = place
-	data := time.Now().Format("2006-01-02 15:04:05")
-	com.Data = data
+	date := time.Now().Format("2006-01-02 15:04:05")
+	com.Date = date
 	currentTime := strconv.FormatInt(time.Now().Unix(), 10)
 	com.CommentUID = au.EncryptMd5(user.UserAccount + currentTime)
-	if com.Sentence != "" || com.PhotoData != nil {
+	if com.Text != "" || com.Photo.PhotoData != nil {
 		err := con.GLOBAL_DB.Model(&con.Comment{}).Create(&com).Error
 		if err != nil {
 			log.Println(err)
@@ -77,6 +77,7 @@ func GetComment(c string) con.Comment {
 	return com
 }
 
+// 时间排序
 func HandleNewComments(ctx *gin.Context) {
 	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&newComments).Error
 	if err != nil {
@@ -87,6 +88,7 @@ func HandleNewComments(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newComments)
 }
 
+// 点赞数排序
 func HandleHotComments(ctx *gin.Context) {
 	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&hotComments).Error
 	if err != nil {

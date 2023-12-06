@@ -69,6 +69,6 @@ func SendAvatarToFrontend(ctx *gin.Context) {
 	// 将头像数据发送给前端
 	ctx.Data(http.StatusOK, "image/jpeg", avatar.AvatarData)
 	ctx.JSON(http.StatusOK, gin.H{
-		"avatar_id": avatar.AvatarID,
+		"user_account": avatar.UserAccount,
 	})
 }

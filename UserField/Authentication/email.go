@@ -42,7 +42,7 @@ func SendEmail(ctx *gin.Context) {
 	msg := mailer.NewMessage()
 	TempCaptcha = rand.Intn(900000) + 100000
 	randNum := strconv.Itoa(TempCaptcha)
-	msg.SetHeader("From", "m19870110195@163.com")
+	msg.SetHeader("From", GlobalConfig.Email.UserName)
 	msg.SetHeader("To", tu.UserAccount)
 	msg.SetHeader("Subject", "您的漫GO验证码")
 	msg.SetBody("text/html", "<h3>您的漫GO验证码为</h3><p>"+randNum+"<p>")
