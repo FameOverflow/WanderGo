@@ -2,9 +2,11 @@ package Position
 
 import (
 	con "SparkForge/Config"
+	so "SparkForge/Sort"
 	"log"
 	"math/rand"
 	"net/http"
+	"sort"
 
 	"github.com/gin-gonic/gin"
 )
@@ -48,21 +50,24 @@ func Roaming(ctx *gin.Context) {
 	randomIndex := rand.Intn(len(places))
 	selectedPlace := places[randomIndex]
 	var pl con.Place
-	con.GLOBAL_DB.Preload("Comments").Where("place_uid = ?", selectedPlace.PlaceUID).First(&pl)
+	con.GLOBAL_DB.Preload("Comments").Where("id = ?", selectedPlace.ID).First(&pl)
 	if len(pl.Comments) == 0 {
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "此处没有漫游点",
 		})
 		return
 	}
-	randomCommentIndex := rand.Intn(len(pl.Comments))
-	selectedComment := pl.Comments[randomCommentIndex]
+	randomCommentIndex := rand.Intn(4)
+	so.HHotComments = pl.Comments
+	sort.Sort(so.HHotComments)
+	selectedComment := so.HHotComments[randomCommentIndex]
 	ctx.JSON(http.StatusOK, gin.H{
-		"place_uid":  selectedPlace.PlaceUID,
+		"id":         selectedPlace.ID,
 		"place_name": selectedPlace.PlaceName,
 	})
 	ctx.JSON(http.StatusOK, gin.H{
-		"text": selectedComment.Text,
+		"text":      selectedComment.Text,
+		"star_cnts": selectedComment.StarCnt,
 	})
 	ctx.Data(http.StatusOK, "image/jpeg", selectedComment.PhotoData)
 }

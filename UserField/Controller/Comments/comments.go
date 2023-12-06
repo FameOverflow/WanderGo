@@ -4,6 +4,7 @@ import (
 	au "SparkForge/Authentication"
 	con "SparkForge/Config"
 	pos "SparkForge/Controller/Position"
+	so "SparkForge/Sort"
 	"fmt"
 	"log"
 	"net/http"
@@ -82,22 +83,22 @@ func GetComment(c string) con.Comment {
 
 // 时间排序
 func HandleNewComments(ctx *gin.Context) {
-	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&newComments).Error
+	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&so.NNewComments).Error
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	sort.Sort(newComments)
-	ctx.JSON(http.StatusOK, newComments)
+	sort.Sort(so.NNewComments)
+	ctx.JSON(http.StatusOK, so.NNewComments)
 }
 
 // 点赞数排序
 func HandleHotComments(ctx *gin.Context) {
-	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&hotComments).Error
+	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&so.HHotComments).Error
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	sort.Sort(hotComments)
-	ctx.JSON(http.StatusOK, hotComments)
+	sort.Sort(so.HHotComments)
+	ctx.JSON(http.StatusOK, so.HHotComments)
 }

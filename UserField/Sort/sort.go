@@ -1,4 +1,4 @@
-package Comment
+package Sort
 
 import (
 	con "SparkForge/Config"
@@ -7,8 +7,8 @@ import (
 type HotComments []con.Comment
 type NewComments []con.Comment
 
-var hotComments HotComments
-var newComments NewComments
+var HHotComments HotComments
+var NNewComments NewComments
 
 func (a HotComments) Len() int {
 	return len(a)
