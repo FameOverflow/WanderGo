@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,7 +27,9 @@ func PostComment(ctx *gin.Context) {
 	user := au.GetUser(com.UserAccount)
 	com.User = user
 	com.Place = place
-	currentTime := strconv.FormatInt(com.CreatedAt.Unix(), 10)
+	data := time.Now().Format("2006-01-02 15:04:05")
+	com.Data = data
+	currentTime := strconv.FormatInt(time.Now().Unix(), 10)
 	com.CommentUID = au.EncryptMd5(user.UserAccount + currentTime)
 	if com.Sentence != "" || com.PhotoData != nil {
 		err := con.GLOBAL_DB.Model(&con.Comment{}).Create(&com).Error
@@ -62,4 +66,33 @@ func TestComments(ctx *gin.Context) {
 	var p con.Place
 	con.GLOBAL_DB.Preload("Comments").Take(&p)
 	fmt.Println(p)
+}
+func GetComment(c string) con.Comment {
+	var com con.Comment
+	err := con.GLOBAL_DB.Model(&con.Comment{}).Where("comment_uid = ?", c).First(&com)
+	if err != nil {
+		log.Println(err)
+		return con.Comment{}
+	}
+	return com
+}
+
+func HandleNewComments(ctx *gin.Context) {
+	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&newComments).Error
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	sort.Sort(newComments)
+	ctx.JSON(http.StatusOK, newComments)
+}
+
+func HandleHotComments(ctx *gin.Context) {
+	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&hotComments).Error
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	sort.Sort(hotComments)
+	ctx.JSON(http.StatusOK, hotComments)
 }

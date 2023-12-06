@@ -27,6 +27,7 @@ type User struct {
 	UserPassword string    `gorm:"not null" json:"user_password" binding:"required`
 	UserCaptcha  int       `gorm:"-" json:"user_captcha" binding:"required`
 	Comments     []Comment `gorm:"foreignKey:CommentUID" json:"comments"`
+	Stars        []Star    `gorm:"foreignKey:StarUID"`
 }
 type Photo struct {
 	gorm.Model
@@ -43,6 +44,7 @@ type Avatar struct {
 type Comment struct {
 	gorm.Model
 	UserAccount string  `gorm:"not null;index" json:"user_account"`
+	Data        string  `gorm:"not null" json:"data"`
 	PhotoID     string  `json:"photo_id"`
 	PhotoData   []byte  `json:"photo_data"`
 	Sentence    string  `json:"sentence"`
@@ -51,7 +53,7 @@ type Comment struct {
 	User        User    `gorm:"foreignKey:CommentUID"`
 	Place       Place   `gorm:"foreignKey:CommentUID"`
 	StarCnt     int     `gorm:"default:0" json:"star_cnt"`
-	Stars       []Star  `gorm:"foreignKey:StarID"`
+	Stars       []Star  `gorm:"foreignKey:StarUID"`
 }
 type Place struct {
 	gorm.Model
@@ -61,13 +63,12 @@ type Place struct {
 	BottomRightPoint Address   `gorm:"TYPE:json" json:"bottom_right_point"`
 	CenterPoint      Address   `gorm:"TYPE:json" json:center_point"`
 	Comments         []Comment `gorm:"foreignKey:CommentUID" json:"comments"`
-	Stars            []Star    `gorm:"foreignKey:StarID"`
 }
 type Star struct {
 	gorm.Model
 	UserAccount string  `json:"user_account"`
 	CommentUID  string  `json:"comment_uid"`
 	StarUID     string  `json:"star_uid"`
-	Comment     Comment `gorm:"foreignKey:StarID"`
-	User        User    `gorm:"foreignKey:StarID"`
+	Comment     Comment `gorm:"foreignKey:StarUID"`
+	User        User    `gorm:"foreignKey:StarUID"`
 }

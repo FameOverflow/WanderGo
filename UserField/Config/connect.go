@@ -61,6 +61,13 @@ func ConnectToDb() {
 			return
 		}
 	}
+	if (!GLOBAL_DB.Migrator().HasTable(&Star{})) {
+		err := GLOBAL_DB.AutoMigrate(&Star{})
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
 	// GLOBAL_DB.Model(&Place{}).Create(&Place{
 	// 	PlaceName: "慧源楼",
 	// 	PlaceUID:  0,
