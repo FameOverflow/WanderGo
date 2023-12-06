@@ -5,7 +5,6 @@ import (
 	con "SparkForge/Config"
 	pos "SparkForge/Controller/Position"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"sort"
@@ -22,19 +21,6 @@ func PostComment(ctx *gin.Context) {
 		log.Println(err)
 		return
 	}
-
-	file, _, err := ctx.Request.FormFile("image")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	defer file.Close()
-	buffer, err := io.ReadAll(file)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	com.PhotoData = buffer
 	centerPoint := pos.PositionHandlerComment(com.Position)
 	place := pos.GetPos(centerPoint)
 	com.UserAccount = au.SearchAccount(ctx)
