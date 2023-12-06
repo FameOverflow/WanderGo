@@ -5,6 +5,7 @@ import (
 	con "SparkForge/Config"
 	pos "SparkForge/Controller/Position"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"sort"
@@ -21,6 +22,19 @@ func PostComment(ctx *gin.Context) {
 		log.Println(err)
 		return
 	}
+
+	file, _, err := ctx.Request.FormFile("image")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer file.Close()
+	buffer, err := io.ReadAll(file)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	com.PhotoData = buffer
 	centerPoint := pos.PositionHandlerComment(com.Position)
 	place := pos.GetPos(centerPoint)
 	com.UserAccount = au.SearchAccount(ctx)
@@ -30,15 +44,18 @@ func PostComment(ctx *gin.Context) {
 	date := time.Now().Format("2006-01-02 15:04:05")
 	com.Date = date
 	currentTime := strconv.FormatInt(time.Now().Unix(), 10)
+	fmt.Println(currentTime)
+	fmt.Println(user.UserAccount)
 	com.CommentUID = au.EncryptMd5(user.UserAccount + currentTime)
-	if com.Text != "" || com.Photo.PhotoData != nil {
+	fmt.Println(com.CommentUID)
+	if com.Text != "" || com.PhotoData != nil {
 		err := con.GLOBAL_DB.Model(&con.Comment{}).Create(&com).Error
 		if err != nil {
 			log.Println(err)
 			return
 		}
 		ctx.JSON(http.StatusOK, gin.H{
-			"message":   "添加评论成功",
+			"message":   "Success",
 			"离你最近的中心点为": centerPoint,
 		})
 	}

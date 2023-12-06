@@ -64,5 +64,5 @@ func Roaming(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"text": selectedComment.Text,
 	})
-	ctx.Data(http.StatusOK, "image/jpeg", selectedComment.Photo.PhotoData)
+	ctx.Data(http.StatusOK, "image/jpeg", selectedComment.PhotoData)
 }

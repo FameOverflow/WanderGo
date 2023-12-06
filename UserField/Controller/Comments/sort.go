@@ -24,7 +24,7 @@ func (a NewComments) Len() int {
 	return len(a)
 }
 func (a NewComments) Less(i, j int) bool {
-	return a[i].Data > a[j].Data
+	return a[i].Date > a[j].Date
 }
 func (a NewComments) Swap(i, j int) {
 	a[i], a[j] = a[j], a[i]
