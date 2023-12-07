@@ -33,8 +33,8 @@ func PostComment(ctx *gin.Context) {
 	currentTime := strconv.FormatInt(time.Now().Unix(), 10)
 	fmt.Println(currentTime)
 	fmt.Println(user.UserAccount)
-	com.CommentUID = au.EncryptMd5(user.UserAccount + currentTime)
-	fmt.Println(com.CommentUID)
+	com.CommentUUID = au.EncryptMd5(user.UserAccount + currentTime)
+	fmt.Println(com.CommentUUID)
 	if com.Text != "" || com.PhotoData != nil {
 		err := con.GLOBAL_DB.Model(&con.Comment{}).Create(&com).Error
 		if err != nil {
@@ -42,8 +42,9 @@ func PostComment(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusOK, gin.H{
-			"message":   "Success",
-			"离你最近的中心点为": centerPoint,
+			"message":      "Success",
+			"离你最近的中心点为":    centerPoint,
+			"comment_uuid": com.CommentUUID,
 		})
 	}
 }
@@ -73,7 +74,7 @@ func TestComments(ctx *gin.Context) {
 }
 func GetComment(c string) con.Comment {
 	var com con.Comment
-	err := con.GLOBAL_DB.Model(&con.Comment{}).Where("comment_uid = ?", c).First(&com)
+	err := con.GLOBAL_DB.Model(&con.Comment{}).Where("comment_uuid = ?", c).First(&com).Error
 	if err != nil {
 		log.Println(err)
 		return con.Comment{}

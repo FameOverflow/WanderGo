@@ -53,7 +53,8 @@ func Roaming(ctx *gin.Context) {
 	con.GLOBAL_DB.Preload("Comments").Where("id = ?", selectedPlace.ID).First(&pl)
 	if len(pl.Comments) == 0 {
 		ctx.JSON(http.StatusOK, gin.H{
-			"message": "此处没有漫游点",
+			"message":    "此处没有漫游点",
+			"place_name": selectedPlace.PlaceName,
 		})
 		return
 	}

@@ -32,6 +32,7 @@ func Start() {
 	engine.POST("/LoadAvatar", au.SendAvatarToFrontend)
 	engine.POST("/PostComment", mid.LoginVerification(), com.PostComment)
 	engine.POST("/Roaming", mid.LoginVerification(), pos.Roaming)
+	engine.POST("/Like", mid.LoginVerification(), com.LikeHandler)
 	engine.POST("/test", com.TestComments)
 	engine.Run(":8080")
 }

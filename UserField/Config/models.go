@@ -56,11 +56,12 @@ type Comment struct {
 	Date        string  `gorm:"not null" json:"date"`
 	PhotoUID    string  `json:"photo_uid"`
 	Text        string  `json:"text"`
+	CommentUUID string  `gorm:"not null" json:"comment_uuid"`
 	CommentUID  string  `gorm:"not null" json:"comment_uid"`
 	Position    Address `gorm:"-" json:"position"`
 	User        User    `gorm:"foreignKey:CommentUID"`
 	Place       Place   `gorm:"foreignKey:CommentUID"`
-	StarCnt     int     `gorm:"default:0" json:"star_cnt"`
+	StarCnt     int     `gorm:"not null" json:"star_cnt"`
 	Stars       []Star  `gorm:"foreignKey:StarUID"`
 	PhotoData   []byte  `gorm:"json:"photo_data"`
 }
@@ -76,8 +77,8 @@ type Place struct {
 type Star struct {
 	gorm.Model
 	UserAccount string  `json:"user_account"`
-	CommentUID  string  `json:"comment_uid"`
-	StarUID     string  `json:"star_uid"`
+	CommentUUID string  `gorm:"not null" json:"comment_uuid"`
+	StarUID     string  `gorm:"not null" json:"star_uid"`
 	Comment     Comment `gorm:"foreignKey:StarUID"`
 	User        User    `gorm:"foreignKey:StarUID"`
 }

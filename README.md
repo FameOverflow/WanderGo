@@ -28,4 +28,6 @@
  	engine.POST("PostComment",  mid.LoginOrNot(),com.AddComment)
 ### 随机漫游 "x","y"
   	engine.POST("/Roaming", mid.LoginVerification(), pos.Roaming)
+### 点赞	"comment_uuid"
+	engine.POST("/Like",mid.LoginVerification(),com.LikeHandler)
 	engine.Run(":8080")
