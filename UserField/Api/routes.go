@@ -3,7 +3,7 @@ package Api
 import (
 	au "SparkForge/Authentication"
 	com "SparkForge/Controller/Comments"
-
+	ini "SparkForge/Controller/Init"
 	pos "SparkForge/Controller/Position"
 	mid "SparkForge/MiddleWare"
 	oss "SparkForge/OSS"
@@ -38,6 +38,7 @@ func Start() {
 	engine.POST("/MarkPlace", pos.MarkPlace)
 	engine.POST("/GetSTS", oss.GetSTS)
 	engine.POST("/SearchPlaces", mid.LoginVerification(), pos.PositionsHandler)
-	engine.POST("Begin", au.LoadPersonalInformation)
+	engine.POST("BeginWithPersonalInformation", ini.LoadPersonalInformation)
+	engine.POST("BeginWithPlacesInformation", ini.LoadPlacesInformation)
 	engine.Run(":8080")
 }

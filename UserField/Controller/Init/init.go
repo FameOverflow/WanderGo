@@ -48,7 +48,13 @@ func LoadPlacesInformation(ctx *gin.Context) {
 		sort.Sort(util.NNewComments)
 		places[i].Comments = util.NNewComments
 	}
+	var comments []con.Comment
+	for i := range places {
+		comments = append(comments, places[i].Comments...)
+	}
+	//comment_uid是其所在地点的id
+	//comment_uuid是该评论的标识
 	ctx.JSON(http.StatusOK, gin.H{
-		"comments_in_place": places,
+		"comments_in_place": comments,
 	})
 }
