@@ -175,8 +175,12 @@ func ChangePwdHandler(ctx *gin.Context) {
 	}
 	var tempUser con.User
 	userAcct := SearchAccount(ctx)
-	con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?").First(&tempUser)
-	if tempUser.UserPassword != passwordChanging.OldPwd {
+	err = con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", userAcct).First(&tempUser).Error
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if tempUser.UserPassword != util.EncryptMd5(passwordChanging.OldPwd) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"message": "输入的旧密码错误",
 		})

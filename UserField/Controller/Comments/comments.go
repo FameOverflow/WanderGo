@@ -43,8 +43,8 @@ func PostComment(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusOK, gin.H{
-			"message":      "Success",
-			"离你最近的中心点为":    centerPoint,
+			"message":      "成功发布评论",
+			"comment_uid":  place.ID,
 			"comment_uuid": com.CommentUUID,
 		})
 	}

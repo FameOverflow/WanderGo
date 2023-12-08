@@ -8,6 +8,7 @@ import (
 	"github.com/russross/blackfriday"
 )
 
+// 迭代
 func MarkToHtml() {
 
 	input := []byte(`
