@@ -7,10 +7,12 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 
 	con "SparkForge/configs"
 	util "SparkForge/util"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	mailer "gopkg.in/gomail.v2"
 )
@@ -29,8 +31,8 @@ func RegisterHandler(ctx *gin.Context) {
 	registerAcct.UserPassword = util.EncryptMd5(registerAcct.UserPassword)
 	if CompareCaptcha(registerAcct.UserCaptcha) {
 		con.GLOBAL_DB.Model(&con.User{}).Create(&registerAcct)
-		ctx.SetCookie("_uuid", util.EncryptMd5(registerAcct.UserAccount), 2592000, "/", "localhost", false, true)
 		token := util.GetToken(registerAcct.UserAccount)
+		ctx.SetCookie("_token", "Bearer "+token, 2592000, "/", "localhost", false, true)
 		ctx.Request.Header.Set("Authorization", "Bearer "+token)
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "注册成功",
@@ -66,8 +68,9 @@ func LoginHandler(ctx *gin.Context) {
 		return
 	}
 	token := util.GetToken(loginAcct.UserAccount)
-	ctx.SetCookie("_token", token, 2592000, "/", "localhost", false, true)
-	ctx.Request.Header.Set("Authorization", "Bearer "+token)
+	BearerToken := "Bearer " + token
+	ctx.SetCookie("_token", BearerToken, 2592000, "/", "localhost", false, true)
+	ctx.Request.Header.Set("Authorization", BearerToken)
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "登录成功",
 	})
@@ -76,7 +79,7 @@ func LoginHandler(ctx *gin.Context) {
 
 // 用户退出登录清除cookie和token
 func ExitHandler(ctx *gin.Context) {
-	ctx.SetCookie("_uuid", "", 0, "/", "", false, true)
+	ctx.SetCookie("_token", "", 0, "/", "", false, true)
 	ctx.Request.Header.Del("Authorization")
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "您已成功退出该账号",
@@ -183,4 +186,34 @@ func ChangePwdHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "修改密码成功",
 	})
+}
+
+// 通过token找到对应账号
+func SearchAccount(ctx *gin.Context) string {
+	auth := ctx.Request.Header.Get("Authorization")
+	misakura := 0
+	if auth == "" {
+		authCookie, err := ctx.Request.Cookie("_token")
+		if err == nil {
+			auth = authCookie.Value
+			misakura = 1
+		}
+	}
+	fmt.Println(auth)
+	var authAll []string
+	if misakura == 0 {
+		authAll = strings.Split(auth, " ")
+	} else {
+		authAll = strings.Split(auth, "+")
+	}
+	myClaims := &util.MyClaims{}
+	_, err := jwt.ParseWithClaims(authAll[1], myClaims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(util.SigningKey), nil
+	})
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	return myClaims.Account
+
 }

@@ -2,13 +2,10 @@ package Authentication
 
 import (
 	con "SparkForge/configs"
-	util "SparkForge/util"
 	"io"
 	"log"
 	"net/http"
-	"strings"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
@@ -74,26 +71,4 @@ func SendAvatarToFrontend(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"user_account": avatar.UserAccount,
 	})
-}
-
-// 通过token找到对应账号
-func SearchAccount(ctx *gin.Context) string {
-	auth := ctx.Request.Header.Get("Authorization")
-	if auth == "" {
-		authCookie, err := ctx.Request.Cookie("_token")
-		if err == nil {
-			auth = authCookie.Value
-		}
-	}
-	authAll := strings.Split(auth, " ")
-	myClaims := &util.MyClaims{}
-	_, err := jwt.ParseWithClaims(authAll[1], myClaims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(util.SigningKey), nil
-	})
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-	return myClaims.Account
-
 }
