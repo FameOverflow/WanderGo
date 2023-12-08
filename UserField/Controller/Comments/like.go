@@ -1,8 +1,9 @@
 package Comment
 
 import (
-	au "SparkForge/Authentication"
-	con "SparkForge/Config"
+	con "SparkForge/configs"
+	au "SparkForge/controller/authentication"
+	util "SparkForge/util"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,7 +21,7 @@ func LikeHandler(ctx *gin.Context) { //"comment_uuid"
 	star.UserAccount = au.SearchAccount(ctx)
 	com := GetComment(star.CommentUUID)
 	fmt.Println(com)
-	user := au.GetUser(star.UserAccount)
+	user := util.GetUser(star.UserAccount)
 	star.User = user
 	star.Comment = com
 	err = con.GLOBAL_DB.Model(&con.Star{}).Create(&star).Error

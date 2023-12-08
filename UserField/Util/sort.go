@@ -1,7 +1,7 @@
 package Util
 
 import (
-	con "SparkForge/Config"
+	con "SparkForge/configs"
 )
 
 type HotComments []con.Comment

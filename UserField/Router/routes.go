@@ -1,12 +1,13 @@
 package Api
 
 import (
-	au "SparkForge/Authentication"
-	com "SparkForge/Controller/Comments"
-	ini "SparkForge/Controller/Init"
-	pos "SparkForge/Controller/Position"
-	mid "SparkForge/MiddleWare"
 	oss "SparkForge/OSS"
+	au "SparkForge/controller/authentication"
+	com "SparkForge/controller/comments"
+	ini "SparkForge/controller/init"
+	pos "SparkForge/controller/position"
+	mid "SparkForge/middleWare"
+	util "SparkForge/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -15,7 +16,7 @@ import (
 
 func Start() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("ruleOfPwd", au.RuleOfPwd)
+		v.RegisterValidation("ruleOfPwd", util.RuleOfPwd)
 	}
 	//暂未分组
 	engine := gin.Default()

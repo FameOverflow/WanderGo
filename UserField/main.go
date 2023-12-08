@@ -1,8 +1,8 @@
 package main
 
 import (
-	rou "SparkForge/Api"
-	con "SparkForge/Config"
+	con "SparkForge/configs"
+	rou "SparkForge/router"
 )
 
 func main() {

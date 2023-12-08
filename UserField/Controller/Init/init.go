@@ -1,9 +1,9 @@
 package Init
 
 import (
-	au "SparkForge/Authentication"
-	con "SparkForge/Config"
-	util "SparkForge/Util"
+	con "SparkForge/configs"
+	au "SparkForge/controller/authentication"
+	util "SparkForge/util"
 	"log"
 	"net/http"
 	"sort"
@@ -21,7 +21,7 @@ func LoadPersonalInformation(ctx *gin.Context) {
 		})
 		return
 	}
-	user := au.GetUser(acct)
+	user := util.GetUser(acct)
 	var u con.User
 	con.GLOBAL_DB.Preload("Comments").Where("id = ?", user.ID).First(&u)
 	//时间排序

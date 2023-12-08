@@ -1,7 +1,7 @@
 package MiddleWare
 
 import (
-	au "SparkForge/Authentication"
+	util "SparkForge/util"
 	"net/http"
 	"strings"
 
@@ -20,9 +20,9 @@ func LoginVerification() gin.HandlerFunc {
 			ctx.Abort()
 		}
 		authAll := strings.Split(auth, " ")
-		myClaims := &au.MyClaims{}
+		myClaims := &util.MyClaims{}
 		token, err := jwt.ParseWithClaims(authAll[1], myClaims, func(token *jwt.Token) (interface{}, error) {
-			return []byte(au.SigningKey), nil
+			return []byte(util.SigningKey), nil
 		})
 		if err != nil {
 			ctx.JSON(http.StatusUnauthorized, gin.H{

@@ -1,8 +1,8 @@
 package Position
 
 import (
-	con "SparkForge/Config"
-	util "SparkForge/Util"
+	con "SparkForge/configs"
+	util "SparkForge/util"
 	"errors"
 	"log"
 	"math/rand"
