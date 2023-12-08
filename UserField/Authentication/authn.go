@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	con "SparkForge/Config"
+	util "SparkForge/Util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,10 +21,10 @@ func RegisterHandler(ctx *gin.Context) {
 		log.Printf("err: %v\n", err)
 		return
 	}
-	registerAcct.UserPassword = EncryptMd5(registerAcct.UserPassword)
+	registerAcct.UserPassword = util.EncryptMd5(registerAcct.UserPassword)
 	if CompareCaptcha(registerAcct.UserCaptcha) {
 		con.GLOBAL_DB.Model(&con.User{}).Create(&registerAcct)
-		ctx.SetCookie("UserName", EncryptMd5(registerAcct.UserName), 2592000, "/", "localhost", false, true)
+		ctx.SetCookie("_uuid", util.EncryptMd5(registerAcct.UserAccount), 2592000, "/", "localhost", false, true)
 		token := GetToken(registerAcct.UserAccount)
 		ctx.Request.Header.Set("Authorization", "Bearer "+token)
 		ctx.JSON(http.StatusOK, gin.H{
@@ -59,8 +60,8 @@ func LoginHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.SetCookie("UserName", EncryptMd5(loginAcct.UserName), 2592000, "/", "localhost", false, true)
 	token := GetToken(loginAcct.UserAccount)
+	ctx.SetCookie("_token", token, 2592000, "/", "localhost", false, true)
 	ctx.Request.Header.Set("Authorization", "Bearer "+token)
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "登录成功",
@@ -70,14 +71,9 @@ func LoginHandler(ctx *gin.Context) {
 
 // 用户退出登录清除cookie和token
 func ExitHandler(ctx *gin.Context) {
-	ctx.SetCookie("UserName", "", 0, "/", "", false, true)
+	ctx.SetCookie("_uuid", "", 0, "/", "", false, true)
 	ctx.Request.Header.Del("Authorization")
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "您已成功退出该账号",
 	})
-}
-
-// 载入页面加载个人信息
-func LoadPersonalInformation(ctx *gin.Context) {
-
 }

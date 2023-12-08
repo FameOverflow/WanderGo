@@ -6,6 +6,7 @@ import (
 
 	pos "SparkForge/Controller/Position"
 	mid "SparkForge/MiddleWare"
+	oss "SparkForge/OSS"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -34,5 +35,9 @@ func Start() {
 	engine.POST("/Roaming", mid.LoginVerification(), pos.Roaming)
 	engine.POST("/Like", mid.LoginVerification(), com.LikeHandler)
 	engine.POST("/test", com.TestComments)
+	engine.POST("/MarkPlace", pos.MarkPlace)
+	engine.POST("/GetSTS", oss.GetSTS)
+	engine.POST("/SearchPlaces", mid.LoginVerification(), pos.PositionsHandler)
+	engine.POST("Begin", au.LoadPersonalInformation)
 	engine.Run(":8080")
 }

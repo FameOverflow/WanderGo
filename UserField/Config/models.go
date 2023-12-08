@@ -71,9 +71,12 @@ type Place struct {
 	PlaceUID         int       `gorm:"not null" json:"place_uid"`
 	TopLeftPoint     Address   `gorm:"TYPE:json" json:"top_left_point"`
 	BottomRightPoint Address   `gorm:"TYPE:json" json:"bottom_right_point"`
-	CenterPoint      Address   `gorm:"TYPE:json" json:center_point"`
+	CenterPoint      Address   `gorm:"TYPE:json" json:"center_point"`
 	Comments         []Comment `gorm:"foreignKey:CommentUID" json:"comments"`
+	IsMarked         bool      `json:"is_marked"`
 }
+
+// 点赞
 type Star struct {
 	gorm.Model
 	UserAccount string  `json:"user_account"`

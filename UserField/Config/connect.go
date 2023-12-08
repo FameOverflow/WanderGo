@@ -3,16 +3,21 @@ package Config
 import (
 	"log"
 
+	"strconv"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
 
 var GLOBAL_DB *gorm.DB
+var GlobalConfig = ReadConfig()
+var DBConfig = GlobalConfig.Database
 
 func ConnectToDb() {
+	var DBDSN = DBConfig.Username + ":" + DBConfig.Password + "@tcp(" + DBConfig.Host + ":" + strconv.Itoa(DBConfig.Port) + ")/" + DBConfig.DBName + "?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.New(mysql.Config{
-		DSN:               "root:fakepwd@tcp(127.0.0.1:3306)/spark_forge?charset=utf8mb4&parseTime=True&loc=Local",
+		DSN:               DBDSN,
 		DefaultStringSize: 171,
 	}), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
@@ -75,7 +80,7 @@ func ConnectToDb() {
 	// 信工楼 115.797977,28.661699-115.799694,28.660564
 	// 机电楼 115.798058,28.661722-115.801668,28.662683
 	// 建工楼 115.798964,28.662739-115.802559,28.66329
-	// 休闲1-3栋 115.801743,28.66393-115.803578,28.665229
+	// 休闲1至3栋 115.801743,28.66393-115.803578,28.665229
 	// 一食堂 115.803739,28.66482-115.804527,28.664344
 	// 润溪湖（1） 115.805922,28.66449-115.804366,28.665149
 	// 润溪湖（2） 115.807692,28.662518-115.805268,28.663883

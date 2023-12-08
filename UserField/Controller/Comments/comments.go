@@ -4,7 +4,8 @@ import (
 	au "SparkForge/Authentication"
 	con "SparkForge/Config"
 	pos "SparkForge/Controller/Position"
-	so "SparkForge/Sort"
+	util "SparkForge/Util"
+
 	"fmt"
 	"log"
 	"net/http"
@@ -33,7 +34,7 @@ func PostComment(ctx *gin.Context) {
 	currentTime := strconv.FormatInt(time.Now().Unix(), 10)
 	fmt.Println(currentTime)
 	fmt.Println(user.UserAccount)
-	com.CommentUUID = au.EncryptMd5(user.UserAccount + currentTime)
+	com.CommentUUID = util.EncryptMd5(user.UserAccount + currentTime)
 	fmt.Println(com.CommentUUID)
 	if com.Text != "" || com.PhotoData != nil {
 		err := con.GLOBAL_DB.Model(&con.Comment{}).Create(&com).Error
@@ -84,22 +85,22 @@ func GetComment(c string) con.Comment {
 
 // 时间排序
 func HandleNewComments(ctx *gin.Context) {
-	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&so.NNewComments).Error
+	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&util.NNewComments).Error
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	sort.Sort(so.NNewComments)
-	ctx.JSON(http.StatusOK, so.NNewComments)
+	sort.Sort(util.NNewComments)
+	ctx.JSON(http.StatusOK, util.NNewComments)
 }
 
 // 点赞数排序
 func HandleHotComments(ctx *gin.Context) {
-	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&so.HHotComments).Error
+	err := con.GLOBAL_DB.Model(&con.Comment{}).Find(&util.HHotComments).Error
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	sort.Sort(so.HHotComments)
-	ctx.JSON(http.StatusOK, so.HHotComments)
+	sort.Sort(util.HHotComments)
+	ctx.JSON(http.StatusOK, util.HHotComments)
 }

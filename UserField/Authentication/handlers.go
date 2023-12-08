@@ -2,8 +2,7 @@ package Authentication
 
 import (
 	con "SparkForge/Config"
-	"crypto/md5"
-	"encoding/hex"
+	util "SparkForge/Util"
 	"fmt"
 	"log"
 	"math/rand"
@@ -19,13 +18,6 @@ import (
 	mailer "gopkg.in/gomail.v2"
 )
 
-func EncryptMd5(pwd string) string {
-	pwdByte := []byte(pwd)
-	m := md5.New()
-	m.Write(pwdByte)
-	pwdEncrypt := hex.EncodeToString(m.Sum(nil))
-	return pwdEncrypt
-}
 func AccountConflictVerification(a string) error { //有错说明不冲突
 	var tUser con.User
 	err := con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", a).First(&tUser).Error
@@ -40,7 +32,7 @@ func UserLoginVerification(u con.User) (int, error) {
 		return 1, err
 	} else {
 		// 若账号存在，检测密码是否正确
-		err = con.GLOBAL_DB.Model(&con.User{}).Where(con.User{UserAccount: u.UserAccount, UserPassword: EncryptMd5(u.UserPassword)}, "user_account", "user_password").
+		err = con.GLOBAL_DB.Model(&con.User{}).Where(con.User{UserAccount: u.UserAccount, UserPassword: util.EncryptMd5(u.UserPassword)}, "user_account", "user_password").
 			First(&tUser).Error
 		if err != nil {
 			// 密码不正确
@@ -74,6 +66,12 @@ func GetToken(ac string) string {
 // 通过token找到对应账号
 func SearchAccount(ctx *gin.Context) string {
 	auth := ctx.Request.Header.Get("Authorization")
+	if auth == "" {
+		authCookie, err := ctx.Request.Cookie("_token")
+		if err == nil {
+			auth = authCookie.Value
+		}
+	}
 	authAll := strings.Split(auth, " ")
 	myClaims := &MyClaims{}
 	_, err := jwt.ParseWithClaims(authAll[1], myClaims, func(token *jwt.Token) (interface{}, error) {
@@ -156,7 +154,7 @@ func ChangePwdHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", userAcct).Select("user_password").Updates(con.User{UserPassword: EncryptMd5(passwordChanging.CurrentPwd)})
+	con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", userAcct).Select("user_password").Updates(con.User{UserPassword: util.EncryptMd5(passwordChanging.CurrentPwd)})
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "修改密码成功",
 	})
@@ -185,8 +183,8 @@ func ForgotPasswordGetCaptcha(ctx *gin.Context) {
 	randNum := strconv.Itoa(TempCaptcha)
 	msg.SetHeader("From", "m19870110195@163.com")
 	msg.SetHeader("To", u.UserAccount)
-	msg.SetHeader("Subject", "您的漫GO验证码")
-	msg.SetBody("text/html", "<h3>您的漫GO验证码为</h3><p>"+randNum+"<p>")
+	msg.SetHeader("Subject", "您的慢漫验证码")
+	msg.SetBody("text/html", "<h3>您的慢漫验证码为</h3><p>"+randNum+"<p>")
 	dialer := mailer.NewDialer("smtp.163.com", 465, "m19870110195@163.com", "NMNMIOJXWOGJJJJL")
 	if err := dialer.DialAndSend(msg); err != nil {
 		log.Println(err)
@@ -207,7 +205,7 @@ func ForgotPassword(ctx *gin.Context) {
 		return
 	}
 	if CompareCaptcha(u.UserCaptcha) {
-		con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", u.UserAccount).Select("user_password").Updates(con.User{UserPassword: EncryptMd5(u.NewPwd)})
+		con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", u.UserAccount).Select("user_password").Updates(con.User{UserPassword: util.EncryptMd5(u.NewPwd)})
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "您已成功修改密码,请登录",
 		})
