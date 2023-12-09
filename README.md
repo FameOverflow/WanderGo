@@ -21,13 +21,23 @@
 ### 忘记密码，修改为新密码 "new_pwd"及"user_account"及"user_captcha"
 	engine.POST("/ForgetPwd", au.ForgotPassword)
 ### 上传头像 key为"image"
- 	engine.POST("/AvatarUpload", mid.LoginOrNot(), au.AvatarUpload)
+ 	engine.POST("/UploadAvatar", mid.LoginVerification(), au.AvatarUpload)
 ### 修改头像 key为"image"
- 	engine.POST("AvatarChange", mid.LoginOrNot(), au.AvatarChange)
+ 	engine.POST("/ChangeAvatar", mid.LoginVerification(), au.AvatarChange)
+### 加载图片
+	engine.POST("/LoadAvatar", au.SendAvatarToFrontend)
 ### 发布评论 (注：图和文字至少传一个)"x"及"y"
  	engine.POST("PostComment",  mid.LoginOrNot(),com.AddComment)
 ### 随机漫游 "x","y"
   	engine.POST("/Roaming", mid.LoginVerification(), pos.Roaming)
 ### 点赞	"comment_uuid"
 	engine.POST("/Like",mid.LoginVerification(),com.LikeHandler)
+### 标记地点	"place_uid"
+	engine.POST("/MarkPlace", pos.MarkPlace)
+### 获取STSToken令牌，可用于OSS服务鉴权,成功响应为sts:token
+	engine.POST("/GetSTS", oss.GetSTS)
+### 加载个人信息
+	engine.POST("BeginWithPersonalInformation", ini.LoadPersonalInformation)
+### 加载地点信息
+	engine.POST("BeginWithPlacesInformation", ini.LoadPlacesInformation)
 	engine.Run(":8080")
