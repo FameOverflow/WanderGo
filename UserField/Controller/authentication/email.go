@@ -44,8 +44,8 @@ func SendEmail(ctx *gin.Context) {
 	randNum := strconv.Itoa(TempCaptcha)
 	msg.SetHeader("From", GlobalConfig.Email.UserName)
 	msg.SetHeader("To", tu.UserAccount)
-	msg.SetHeader("Subject", "您的漫GO验证码")
-	msg.SetBody("text/html", "<h3>您的漫GO验证码为</h3><p>"+randNum+"<p>")
+	msg.SetHeader("Subject", "您的慢慢验证码")
+	msg.SetBody("text/html", "<h3>您的慢漫验证码为</h3><p>"+randNum+"<p>")
 	dialer := mailer.NewDialer(GlobalConfig.Email.Host, GlobalConfig.Email.Port, GlobalConfig.Email.UserName, GlobalConfig.Email.Password) //这个授权码随便用，刚创的
 	if err := dialer.DialAndSend(msg); err != nil {
 		log.Println(err)
