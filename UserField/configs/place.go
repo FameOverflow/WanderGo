@@ -16,7 +16,7 @@ func parseInput(input string) []Place {
 		}
 
 		parts := strings.FieldsFunc(line, func(c rune) bool {
-			return c == ' ' || c == ',' || c == '-' || c == ','
+			return c == ' ' || c == '-' || c == ','
 		})
 
 		name := parts[0]

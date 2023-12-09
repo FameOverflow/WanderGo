@@ -63,7 +63,7 @@ type Comment struct {
 	Place       Place   `gorm:"foreignKey:CommentUID"`
 	StarCnt     int     `gorm:"not null" json:"star_cnt"`
 	Stars       []Star  `gorm:"foreignKey:StarUID"`
-	PhotoData   []byte  `gorm:"json:"photo_data"`
+	PhotoData   []byte  `json:"photo_data"`
 }
 type Place struct {
 	gorm.Model

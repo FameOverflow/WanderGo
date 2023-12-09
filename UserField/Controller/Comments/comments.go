@@ -1,4 +1,4 @@
-package Comment
+package Comments
 
 import (
 	con "SparkForge/configs"

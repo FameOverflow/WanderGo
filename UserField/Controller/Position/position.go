@@ -1,4 +1,4 @@
-package Position
+package position
 
 import (
 	con "SparkForge/configs"
