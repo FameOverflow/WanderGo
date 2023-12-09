@@ -1,10 +1,10 @@
 package Comment
 
 import (
-	au "SparkForge/Authentication"
-	con "SparkForge/Config"
-	pos "SparkForge/Controller/Position"
-	util "SparkForge/Util"
+	con "SparkForge/configs"
+	au "SparkForge/controller/authentication"
+	pos "SparkForge/controller/position"
+	util "SparkForge/util"
 
 	"fmt"
 	"log"
@@ -26,7 +26,7 @@ func PostComment(ctx *gin.Context) {
 	centerPoint := pos.PositionHandlerComment(com.Position)
 	place := pos.GetPos(centerPoint)
 	com.UserAccount = au.SearchAccount(ctx)
-	user := au.GetUser(com.UserAccount)
+	user := util.GetUser(com.UserAccount)
 	com.User = user
 	com.Place = place
 	date := time.Now().Format("2006-01-02 15:04:05")
@@ -43,8 +43,8 @@ func PostComment(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusOK, gin.H{
-			"message":      "Success",
-			"离你最近的中心点为":    centerPoint,
+			"message":      "成功发布评论",
+			"comment_uid":  place.ID,
 			"comment_uuid": com.CommentUUID,
 		})
 	}

@@ -33,13 +33,13 @@ func CreateClient(accessKeyId *string, accessKeySecret *string) (_result *sts201
 	return _result, _err
 }
 
-func getSTS() (string,error) {
+func getSTS() (string, error) {
 	// 请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_ID 和 ALIBABA_CLOUD_ACCESS_KEY_SECRET。
 	// 工程代码泄露可能会导致 AccessKey 泄露，并威胁账号下所有资源的安全性。以下代码示例使用环境变量获取 AccessKey 的方式进行调用，仅供参考，建议使用更安全的 STS 方式，更多鉴权访问方式请参见：https://help.aliyun.com/document_detail/378661.html
-	stsToken:=""
+	stsToken := ""
 	client, err := CreateClient(tea.String("LTAI5t5rPhn5UbdoLLQncn8r"), tea.String("KGJn7jyzCUBbX7wIgCFpVhngQhY7JK"))
 	if err != nil {
-		return stsToken,err
+		return stsToken, err
 	}
 
 	assumeRoleRequest := &sts20150401.AssumeRoleRequest{
@@ -79,26 +79,25 @@ func getSTS() (string,error) {
 		d := json.NewDecoder(strings.NewReader(tea.StringValue(error.Data)))
 		d.Decode(&data)
 		if m, ok := data.(map[string]interface{}); ok {
-			recommend:= m["Recommend"]
+			recommend := m["Recommend"]
 			fmt.Println(recommend)
 		}
 		_, err = util.AssertAsString(error.Message)
 		if err != nil {
-			return stsToken,err
+			return stsToken, err
 		}
 	}
-	return stsToken,nil
+	return stsToken, nil
 }
 
-func GetSTS(ctx *gin.Context){
-	stsToken,err := getSTS()
+func GetSTS(ctx *gin.Context) {
+	stsToken, err := getSTS()
 	if err != nil {
-		ctx.JSON(200,gin.H{
-			"err":err,
+		ctx.JSON(200, gin.H{
+			"err": err,
 		})
 	}
-	ctx.JSON(200,gin.H{
-		"sts":stsToken,
+	ctx.JSON(200, gin.H{
+		"sts": stsToken,
 	})
 }
-

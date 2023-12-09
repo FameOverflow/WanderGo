@@ -1,7 +1,7 @@
 package Authentication
 
 import (
-	conf "SparkForge/Config"
+	conf "SparkForge/configs"
 	"log"
 	"math/rand"
 	"net/http"

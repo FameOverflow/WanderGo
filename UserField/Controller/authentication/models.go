@@ -1,7 +1,5 @@
 package Authentication
 
-import "github.com/dgrijalva/jwt-go"
-
 type PwdToBeChanged struct {
 	OldPwd     string `json:"old_pwd" binding:"required"`
 	CurrentPwd string `json:"current_pwd" binding:"required"`
@@ -25,10 +23,3 @@ type AccctStatus struct {
 	Account            string
 	TimeOfChangingName int64
 }
-type MyClaims struct {
-	Account string `json:"account"`
-	Time    int    `json:"time"`
-	jwt.StandardClaims
-}
-
-var SigningKey = []byte("lightlightlight")

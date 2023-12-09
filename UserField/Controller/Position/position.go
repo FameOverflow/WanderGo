@@ -1,8 +1,8 @@
 package Position
 
 import (
-	con "SparkForge/Config"
-	util "SparkForge/Util"
+	con "SparkForge/configs"
+	util "SparkForge/util"
 	"errors"
 	"log"
 	"math/rand"
@@ -84,12 +84,8 @@ func Roaming(ctx *gin.Context) {
 	sort.Sort(util.HHotComments)
 	selectedComment := util.HHotComments[randomCommentIndex]
 	ctx.JSON(http.StatusOK, gin.H{
-		"id":         selectedPlace.ID,
-		"place_name": selectedPlace.PlaceName,
-	})
-	ctx.JSON(http.StatusOK, gin.H{
-		"text":      selectedComment.Text,
-		"star_cnts": selectedComment.StarCnt,
+		"comment_uid": selectedComment.CommentUID,
+		"star_cnts":   selectedComment.StarCnt,
 	})
 	ctx.Data(http.StatusOK, "image/jpeg", selectedComment.PhotoData)
 }

@@ -1,12 +1,13 @@
 package Api
 
 import (
-	au "SparkForge/Authentication"
-	com "SparkForge/Controller/Comments"
-	ini "SparkForge/Controller/Init"
-	pos "SparkForge/Controller/Position"
-	mid "SparkForge/MiddleWare"
 	oss "SparkForge/OSS"
+	au "SparkForge/controller/authentication"
+	com "SparkForge/controller/comments"
+	ini "SparkForge/controller/init"
+	pos "SparkForge/controller/position"
+	mid "SparkForge/middleWare"
+	util "SparkForge/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -15,30 +16,30 @@ import (
 
 func Start() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("ruleOfPwd", au.RuleOfPwd)
+		v.RegisterValidation("ruleOfPwd", util.RuleOfPwd)
 	}
 	//暂未分组
 	engine := gin.Default()
 	engine.Use(mid.Cors())
-	engine.POST("/GetCaptcha", au.SendEmail)
-	engine.POST("/Register", au.RegisterHandler)
-	engine.POST("/Login", au.LoginHandler)
-	engine.POST("/Exit", au.ExitHandler)
-	engine.POST("/ChangeName", mid.LoginVerification(), au.ChangeNameHandler)
-	engine.POST("/ChangePwd", mid.LoginVerification(), au.ChangePwdHandler)
-	engine.POST("/ForgetPwdPre", au.ForgotPasswordGetCaptcha)
-	engine.POST("/ForgetPwd", au.ForgotPassword)
-	engine.POST("/UploadAvatar", mid.LoginVerification(), au.AvatarUpload)
-	engine.POST("/ChangeAvatar", mid.LoginVerification(), au.AvatarChange)
-	engine.POST("/LoadAvatar", au.SendAvatarToFrontend)
-	engine.POST("/PostComment", mid.LoginVerification(), com.PostComment)
-	engine.POST("/Roaming", mid.LoginVerification(), pos.Roaming)
-	engine.POST("/Like", mid.LoginVerification(), com.LikeHandler)
+	engine.POST("/register/captcha", au.SendEmail)
+	engine.POST("/register", au.RegisterHandler)
+	engine.POST("/login", au.LoginHandler)
+	engine.POST("/exit", au.ExitHandler)
+	engine.POST("/names/change", mid.LoginVerification(), au.ChangeNameHandler)
+	engine.POST("/passwords/change", mid.LoginVerification(), au.ChangePwdHandler)
+	engine.POST("/passwords/forget/captcha", au.ForgotPasswordGetCaptcha)
+	engine.POST("/passwords/forget", au.ForgotPassword)
+	engine.POST("/avatars/upload", mid.LoginVerification(), au.AvatarUpload)
+	engine.POST("/avatars/change", mid.LoginVerification(), au.AvatarChange)
+	engine.POST("/avatars/load", au.SendAvatarToFrontend)
+	engine.POST("/comments/post", mid.LoginVerification(), com.PostComment)
+	engine.POST("/comments/roam", mid.LoginVerification(), pos.Roaming)
+	engine.POST("/comments/like", mid.LoginVerification(), com.LikeHandler)
 	engine.POST("/test", com.TestComments)
-	engine.POST("/MarkPlace", pos.MarkPlace)
-	engine.POST("/GetSTS", oss.GetSTS)
-	engine.POST("/SearchPlaces", mid.LoginVerification(), pos.PositionsHandler)
-	engine.POST("BeginWithPersonalInformation", ini.LoadPersonalInformation)
-	engine.POST("BeginWithPlacesInformation", ini.LoadPlacesInformation)
+	engine.POST("/places/mark", pos.MarkPlace)
+	engine.POST("/sts/get", oss.GetSTS)
+	engine.POST("/places/get", mid.LoginVerification(), pos.PositionsHandler)
+	engine.POST("/begin/user", ini.LoadPersonalInformation)
+	engine.POST("/begin/places", ini.LoadPlacesInformation)
 	engine.Run(":8080")
 }

@@ -1,9 +1,9 @@
 package Init
 
 import (
-	au "SparkForge/Authentication"
-	con "SparkForge/Config"
-	util "SparkForge/Util"
+	con "SparkForge/configs"
+	au "SparkForge/controller/authentication"
+	util "SparkForge/util"
 	"log"
 	"net/http"
 	"sort"
@@ -21,7 +21,7 @@ func LoadPersonalInformation(ctx *gin.Context) {
 		})
 		return
 	}
-	user := au.GetUser(acct)
+	user := util.GetUser(acct)
 	var u con.User
 	con.GLOBAL_DB.Preload("Comments").Where("id = ?", user.ID).First(&u)
 	//时间排序
@@ -35,7 +35,7 @@ func LoadPersonalInformation(ctx *gin.Context) {
 func LoadPlacesInformation(ctx *gin.Context) {
 	//地点评论
 	var places []con.Place
-	err := con.GLOBAL_DB.Preload("Comments").Where("is_marked = 0").Find(&places).Error
+	err := con.GLOBAL_DB.Preload("Comments").Where("is_marked = 1").Find(&places).Error
 	if err != nil {
 		log.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -52,8 +52,8 @@ func LoadPlacesInformation(ctx *gin.Context) {
 	for i := range places {
 		comments = append(comments, places[i].Comments...)
 	}
-	//comment_uid是其所在地点的id
-	//comment_uuid是该评论的标识
+	//comment_uid是其所在地点的编号
+	//comment_uuid是该评论的编号
 	ctx.JSON(http.StatusOK, gin.H{
 		"comments_in_place": comments,
 	})
