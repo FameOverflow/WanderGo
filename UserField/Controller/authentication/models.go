@@ -23,3 +23,11 @@ type AccctStatus struct {
 	Account            string
 	TimeOfChangingName int64
 }
+type CommentsPayload struct {
+	UserAccount string `gorm:"not null;index" json:"user_account"`
+	Date        string `gorm:"not null" json:"date"`
+	Text        string `json:"text"`
+	CommentUUID string `gorm:"not null" json:"comment_uuid"`
+	PlaceUID    uint   `gorm:"not null" json:"place_uid"`
+	StarCnt     int    `gorm:"not null" json:"star_cnt"`
+}

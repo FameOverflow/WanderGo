@@ -5,8 +5,8 @@ import (
 	au "SparkForge/controller/authentication"
 	pos "SparkForge/controller/position"
 	util "SparkForge/util"
-
 	"fmt"
+
 	"log"
 	"net/http"
 	"sort"
@@ -24,7 +24,9 @@ func PostComment(ctx *gin.Context) {
 		return
 	}
 	centerPoint := pos.PositionHandlerComment(com.Position)
+	fmt.Println(centerPoint)
 	place := pos.GetPos(centerPoint)
+	fmt.Printf("place: %v\n", place)
 	com.UserAccount = au.SearchAccount(ctx)
 	user := util.GetUser(com.UserAccount)
 	com.User = user
@@ -32,10 +34,7 @@ func PostComment(ctx *gin.Context) {
 	date := time.Now().Format("2006-01-02 15:04:05")
 	com.Date = date
 	currentTime := strconv.FormatInt(time.Now().Unix(), 10)
-	fmt.Println(currentTime)
-	fmt.Println(user.UserAccount)
 	com.CommentUUID = util.EncryptMd5(user.UserAccount + currentTime)
-	fmt.Println(com.CommentUUID)
 	if com.Text != "" || com.PhotoData != nil {
 		err := con.GLOBAL_DB.Model(&con.Comment{}).Create(&com).Error
 		if err != nil {
@@ -69,8 +68,11 @@ func TestComments(ctx *gin.Context) {
 	// var com dbf.User
 	// dbf.GLOBAL_DB.Preload("Comments").Take(&com)
 	// fmt.Println(com)
-	var p con.Place
-	con.GLOBAL_DB.Preload("Comments").Take(&p)
+	var p con.User
+	con.GLOBAL_DB.Preload("Comments").Where("user_account = ?", "panyaan@ncuhome.club").First(&p)
+	// con.GLOBAL_DB.Preload("Comments").Take(&p)
+	// var pp con.Place
+	// con.GLOBAL_DB.Preload("Comments").Find(&pp)
 	fmt.Println(p)
 }
 func GetComment(c string) con.Comment {

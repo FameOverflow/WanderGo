@@ -33,8 +33,8 @@ type User struct {
 	UserAccount  string    `gorm:"not null;index" json:"user_account"`
 	UserPassword string    `gorm:"not null" json:"user_password"`
 	UserCaptcha  int       `gorm:"-" json:"user_captcha"`
-	Comments     []Comment `gorm:"foreignKey:CommentUID" json:"comments"`
-	Stars        []Star    `gorm:"foreignKey:StarUID"`
+	Comments     []Comment `gorm:"foreignKey:UserUID" json:"comments"`
+	Stars        []Star    `gorm:"foreignKey:UserUID"`
 	Photos       []Photo   `gorm:"foreignKey:PhotoUID"`
 }
 type Photo struct {
@@ -57,22 +57,22 @@ type Comment struct {
 	PhotoUID    string  `json:"photo_uid"`
 	Text        string  `json:"text"`
 	CommentUUID string  `gorm:"not null" json:"comment_uuid"`
-	CommentUID  string  `gorm:"not null" json:"comment_uid"`
+	UserUID     uint    `gorm:"not null" json:"user_uid"`
+	PlaceUID    uint    `gorm:"not null" json:"place_uid"`
 	Position    Address `gorm:"-" json:"position"`
-	User        User    `gorm:"foreignKey:CommentUID"`
-	Place       Place   `gorm:"foreignKey:CommentUID"`
+	User        User    `gorm:"foreignKey:UserUID"`
+	Place       Place   `gorm:"foreignKey:PlaceUID"`
 	StarCnt     int     `gorm:"not null" json:"star_cnt"`
-	Stars       []Star  `gorm:"foreignKey:StarUID"`
+	Stars       []Star  `gorm:"foreignKey:CommentUID"`
 	PhotoData   []byte  `gorm:"json:"photo_data"`
 }
 type Place struct {
 	gorm.Model
 	PlaceName        string    `gorm:"not null" json:"place_name"`
-	PlaceUID         int       `gorm:"not null" json:"place_uid"`
 	TopLeftPoint     Address   `gorm:"TYPE:json" json:"top_left_point"`
 	BottomRightPoint Address   `gorm:"TYPE:json" json:"bottom_right_point"`
 	CenterPoint      Address   `gorm:"TYPE:json" json:"center_point"`
-	Comments         []Comment `gorm:"foreignKey:CommentUID" json:"comments"`
+	Comments         []Comment `gorm:"foreignKey:PlaceUID" json:"comments"`
 	IsMarked         bool      `json:"is_marked"`
 }
 
@@ -81,7 +81,8 @@ type Star struct {
 	gorm.Model
 	UserAccount string  `json:"user_account"`
 	CommentUUID string  `gorm:"not null" json:"comment_uuid"`
-	StarUID     string  `gorm:"not null" json:"star_uid"`
-	Comment     Comment `gorm:"foreignKey:StarUID"`
-	User        User    `gorm:"foreignKey:StarUID"`
+	UserUID     uint    `gorm:"not null" json:"user_uid"`
+	CommentUID  uint    `gorm:"not null" json:"comment_uid"`
+	Comment     Comment `gorm:"foreignKey:CommentUID"`
+	User        User    `gorm:"foreignKey:UserUID"`
 }

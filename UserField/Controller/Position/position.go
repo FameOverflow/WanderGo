@@ -42,7 +42,9 @@ func PositionsHandler(ctx *gin.Context) {
 	for i := range places {
 		plIDs = append(plIDs, int(places[i].ID))
 	}
-	ctx.JSON(http.StatusOK, plIDs)
+	ctx.JSON(http.StatusOK, gin.H{
+		"place_id": plIDs,
+	})
 }
 
 // 以上两种方法待测试完精确度后再做选择
@@ -84,8 +86,9 @@ func Roaming(ctx *gin.Context) {
 	sort.Sort(util.HHotComments)
 	selectedComment := util.HHotComments[randomCommentIndex]
 	ctx.JSON(http.StatusOK, gin.H{
-		"comment_uid": selectedComment.CommentUID,
-		"star_cnts":   selectedComment.StarCnt,
+		"place_uid": selectedComment.PlaceUID,
+		"star_cnts": selectedComment.StarCnt,
+		"text":      selectedComment.Text,
 	})
 	ctx.Data(http.StatusOK, "image/jpeg", selectedComment.PhotoData)
 }
@@ -98,7 +101,7 @@ func MarkPlace(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "参数错误,绑定失败"})
 		return
 	}
-	if err := con.GLOBAL_DB.Where("place_uid = ?", place.PlaceUID).First(&place).Error; err != nil {
+	if err := con.GLOBAL_DB.Where("id = ?", place.ID).First(&place).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{"message": "未找到对应的地区"})
 			return
