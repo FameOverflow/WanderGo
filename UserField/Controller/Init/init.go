@@ -23,13 +23,24 @@ func LoadPersonalInformation(ctx *gin.Context) {
 	}
 	user := util.GetUser(acct)
 	var u con.User
-	con.GLOBAL_DB.Preload("Comments").Where("id = ?", user.ID).First(&u)
+	con.GLOBAL_DB.Preload("Comments").Where("user_account = ?", user.UserAccount).First(&u)
 	//时间排序
 	util.NNewComments = u.Comments
+	var commentsPayload []au.CommentsPayload
 	sort.Sort(util.NNewComments)
+	for i := range util.NNewComments {
+		commentsPayload = append(commentsPayload, au.CommentsPayload{
+			UserAccount: util.NNewComments[i].UserAccount,
+			Date:        util.NNewComments[i].Date,
+			Text:        util.NNewComments[i].Text,
+			PlaceUID:    util.NNewComments[i].PlaceUID,
+			CommentUUID: util.NNewComments[i].CommentUUID,
+		})
+	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"message":  "已登录",
-		"comments": util.NNewComments,
+		"message":   "正处于登录状态",
+		"comments":  commentsPayload,
+		"user_name": user.UserName,
 	})
 }
 func LoadPlacesInformation(ctx *gin.Context) {
@@ -52,9 +63,20 @@ func LoadPlacesInformation(ctx *gin.Context) {
 	for i := range places {
 		comments = append(comments, places[i].Comments...)
 	}
-	//comment_uid是其所在地点的编号
+	var commentsPayload []au.CommentsPayload
+	for i := range comments {
+		commentsPayload = append(commentsPayload, au.CommentsPayload{
+			UserAccount: comments[i].UserAccount,
+			Date:        comments[i].Date,
+			Text:        comments[i].Text,
+			PlaceUID:    comments[i].PlaceUID,
+			CommentUUID: comments[i].CommentUUID,
+		})
+	}
+
+	//place_uid是其所在地点的编号
 	//comment_uuid是该评论的编号
 	ctx.JSON(http.StatusOK, gin.H{
-		"comments_in_place": comments,
+		"comments_in_place": commentsPayload,
 	})
 }
