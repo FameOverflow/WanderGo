@@ -147,8 +147,10 @@
   }
 
 ```
-
-  
+Headers内有响应token,例如：
+_token=Bearer+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiMTQwNDI4NzE0N0BxcS5jb20iLCJ0aW1lIjoxNzAyMTg1NzUwLCJleHAiOjE3MDMzOTUzNTAsImlzcyI6IkZsMFJlbmNFc3MiLCJuYmYiOjE3MDIxODU3NTB9.fL_3UKUvwCOu70pk0By_FkMhw9ITlfHLS0IfCxtxxcA; Path=/; Domain=localhost; Max-Age=2592000; HttpOnly
+在鉴权请求中设置Authorization:Bearer token,
+例如Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiMTQwNDI4NzE0N0BxcS5jb20iLCJ0aW1lIjoxNzAyMTg1NzUwLCJleHAiOjE3MDMzOTUzNTAsImlzcyI6IkZsMFJlbmNFc3MiLCJuYmYiOjE3MDIxODU3NTB9.fL_3UKUvwCOu70pk0By_FkMhw9ITlfHLS0IfCxtxxcA
   
 
 ## 退出登录部分
