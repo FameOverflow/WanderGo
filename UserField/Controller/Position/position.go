@@ -42,8 +42,13 @@ func PositionsHandler(ctx *gin.Context) {
 	for i := range places {
 		plIDs = append(plIDs, int(places[i].ID))
 	}
+	var pNames []string
+	for i := range places {
+		pNames = append(pNames, places[i].PlaceName)
+	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"place_id": plIDs,
+		"place_name":pNames,
 	})
 }
 
