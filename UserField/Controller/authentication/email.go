@@ -5,7 +5,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"regexp"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +12,6 @@ import (
 )
 
 var TempCaptcha int
-var GlobalConfig = conf.ReadConfig()
 
 func SendEmail(ctx *gin.Context) {
 	var tu TempUser
@@ -23,13 +21,6 @@ func SendEmail(ctx *gin.Context) {
 			"message": "请填写邮箱和密码",
 		})
 		log.Println(err)
-		return
-	}
-	realEmail := regexp.MustCompile("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$")
-	if !realEmail.MatchString(tu.UserAccount) {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "请输入正确的邮箱地址",
-		})
 		return
 	}
 	err = AccountConflictVerification(tu.UserAccount) //验证该邮箱是否已经注册
@@ -42,11 +33,11 @@ func SendEmail(ctx *gin.Context) {
 	msg := mailer.NewMessage()
 	TempCaptcha = rand.Intn(900000) + 100000
 	randNum := strconv.Itoa(TempCaptcha)
-	msg.SetHeader("From", GlobalConfig.Email.UserName)
+	msg.SetHeader("From", conf.EMConfig.UserName)
 	msg.SetHeader("To", tu.UserAccount)
-	msg.SetHeader("Subject", "您的慢慢验证码")
+	msg.SetHeader("Subject", "您的慢漫验证码")
 	msg.SetBody("text/html", "<h3>您的慢漫验证码为</h3><p>"+randNum+"<p>")
-	dialer := mailer.NewDialer(GlobalConfig.Email.Host, GlobalConfig.Email.Port, GlobalConfig.Email.UserName, GlobalConfig.Email.Password) //这个授权码随便用，刚创的
+	dialer := mailer.NewDialer(conf.EMConfig.Host,conf.EMConfig.Port,conf.EMConfig.UserName,conf.EMConfig.Password) //这个授权码随便用，刚创的
 	if err := dialer.DialAndSend(msg); err != nil {
 		log.Println(err)
 		return

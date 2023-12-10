@@ -3,9 +3,6 @@ package Config
 import (
 	"fmt"
 	"log"
-	"os"
-
-	"strconv"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -14,27 +11,8 @@ import (
 
 var GLOBAL_DB *gorm.DB
 
-func ReadDBConfig() DBConfig {
-	// 从环境变量中读取数据库配置信息
-	return DBConfig{
-		Username: os.Getenv("DB_USERNAME"),
-		Password: os.Getenv("DB_PASSWORD"),
-		Host:     os.Getenv("DB_HOST"),
-		Port:     getIntEnv("DB_PORT", 3306),
-		DBName:   os.Getenv("DB_NAME"),
-	}
-}
-
-func getIntEnv(key string, defaultValue int) int {
-	// 从环境变量中获取整数值，如果未设置则使用默认值
-	if value, err := strconv.Atoi(os.Getenv(key)); err == nil {
-		return value
-	}
-	return defaultValue
-}
-
 func ConnectToDb() {
-	DBConfig := ReadDBConfig()
+	var DBConfig = ReadDBConfig()
 	var DBDSN = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		DBConfig.Username, DBConfig.Password, DBConfig.Host, DBConfig.Port, DBConfig.DBName)
 		
