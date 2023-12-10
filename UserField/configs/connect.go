@@ -1,7 +1,9 @@
 package Config
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"strconv"
 
@@ -11,11 +13,31 @@ import (
 )
 
 var GLOBAL_DB *gorm.DB
-var GlobalConfig = ReadConfig()
-var DBConfig = GlobalConfig.Database
+
+func ReadDBConfig() DBConfig {
+	// 从环境变量中读取数据库配置信息
+	return DBConfig{
+		Username: os.Getenv("DB_USERNAME"),
+		Password: os.Getenv("DB_PASSWORD"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     getIntEnv("DB_PORT", 3306),
+		DBName:   os.Getenv("DB_NAME"),
+	}
+}
+
+func getIntEnv(key string, defaultValue int) int {
+	// 从环境变量中获取整数值，如果未设置则使用默认值
+	if value, err := strconv.Atoi(os.Getenv(key)); err == nil {
+		return value
+	}
+	return defaultValue
+}
 
 func ConnectToDb() {
-	var DBDSN = DBConfig.Username + ":" + DBConfig.Password + "@tcp(" + DBConfig.Host + ":" + strconv.Itoa(DBConfig.Port) + ")/" + DBConfig.DBName + "?charset=utf8mb4&parseTime=True&loc=Local"
+	DBConfig := ReadDBConfig()
+	var DBDSN = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		DBConfig.Username, DBConfig.Password, DBConfig.Host, DBConfig.Port, DBConfig.DBName)
+		
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DSN:               DBDSN,
 		DefaultStringSize: 171,
@@ -31,46 +53,14 @@ func ConnectToDb() {
 		return
 	}
 	GLOBAL_DB = db
-	if (!GLOBAL_DB.Migrator().HasTable(&User{})) {
-		err := GLOBAL_DB.AutoMigrate(&User{})
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
-	if (!GLOBAL_DB.Migrator().HasTable(&Avatar{})) {
-		err := GLOBAL_DB.AutoMigrate(&Avatar{})
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
-	if (!GLOBAL_DB.Migrator().HasTable(&Photo{})) {
-		err := GLOBAL_DB.AutoMigrate(&Photo{})
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
-	if (!GLOBAL_DB.Migrator().HasTable(&Place{})) {
-		err := GLOBAL_DB.AutoMigrate(&Place{})
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
-	if (!GLOBAL_DB.Migrator().HasTable(&Comment{})) {
-		err := GLOBAL_DB.AutoMigrate(&Comment{})
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
-	if (!GLOBAL_DB.Migrator().HasTable(&Star{})) {
-		err := GLOBAL_DB.AutoMigrate(&Star{})
-		if err != nil {
-			log.Println(err)
-			return
+	// 检查并迁移每个表
+	models := []interface{}{&User{}, &Avatar{}, &Photo{}, &Place{}, &Comment{}, &Star{}}
+	for _, model := range models {
+		if !GLOBAL_DB.Migrator().HasTable(model) {
+			if err := GLOBAL_DB.AutoMigrate(model); err != nil {
+				log.Println("迁移表时发生错误：", err)
+				return
+			}
 		}
 	}
 	// input := `图书馆 115.79941,28.656973-115.800155,28.655495

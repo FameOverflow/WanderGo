@@ -18,7 +18,7 @@ type EmailConfig struct {
 	Password string `json:"password"`
 }
 
-type DatabaseConfig struct {
+type DBConfig struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Host     string `json:"host"`
@@ -26,20 +26,3 @@ type DatabaseConfig struct {
 	DBName   string `json:"dbname"`
 }
 
-func ReadConfig() Config {
-	file, err := os.Open("config.json")
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-	data, err := io.ReadAll(file)
-	if err != nil {
-		panic(err)
-	}
-	var config Config
-	err = json.Unmarshal(data, &config)
-	if err != nil {
-		panic(err)
-	}
-	return config
-}
