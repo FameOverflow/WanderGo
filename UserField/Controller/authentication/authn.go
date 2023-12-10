@@ -72,6 +72,7 @@ func LoginHandler(ctx *gin.Context) {
 	ctx.Request.Header.Set("Authorization", BearerToken)
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "登录成功",
+		"token":   BearerToken,
 	})
 }
 
