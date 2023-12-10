@@ -460,7 +460,7 @@
 ``` 
   {
     "data": {
-   "sts":token
+   "sts": "CAIS5QF1q6Ft5B2yfSjIr5bFJvTCprtz8pCeYV/YrjNkf7ZIp4jztzz2IHhMe3FvBO8XsPQwm21U6fgblqpoV4QdrI1y/GcpvPpt6gqET9frma7ctM4p6vCMHWyUFGSIvqv7aPn4S9XwY+qkb0u++AZ43br9c0fJPTXnS+rr76RqddMKRAK1QCNbDdNNXGtYpdQdKGHaOITGUHeooBKJUBQz5Vsn1Dolt//imJLE0HeE0g2mkN1yjp/qP52pY/NrOJpCSNqv1IR0DPGZiHEItEUVpfkm0/MZpWiZ58v2GEVK8/tZumBDc3kFGoABIpgyUCKAhlRQfALPOrgoW0+fkIHd/O0oK9p7J9At8Y0uMN8wHKymfS1ua1PSBqlgu7JzslPjZGbNWKOZnBm7JUWrhlTASLpgD559gNR1nQm+UFD8fCaikULaoAVmVPeiRHC69kSztGoiy+QLNBt+Ggmz4zVDk+8S0yZPFjzLHfEgAA=="
     }
   }
 ```

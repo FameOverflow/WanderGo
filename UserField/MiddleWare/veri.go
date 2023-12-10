@@ -26,13 +26,13 @@ func LoginVerification() gin.HandlerFunc {
 		})
 		if err != nil {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"message": "验证登录失败",
+				"message": "验证登录失败,获取token失败",
 			})
 			ctx.Abort()
 		}
 		if !token.Valid {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"message": "验证登录失败",
+				"message": "验证登录失败,token无效",
 			})
 			ctx.Abort()
 		}
