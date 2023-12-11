@@ -9,7 +9,7 @@ import (
 
 type MyClaims struct {
 	Account string `json:"account"`
-	Time    int    `json:"time"`
+	Time    int64    `json:"time"`
 	jwt.StandardClaims
 }
 
@@ -19,11 +19,11 @@ var SigningKey = []byte("lightlightlight")
 func GetToken(ac string) string {
 	AcTokenPre := MyClaims{
 		ac,
-		int(time.Now().Unix()),
+		time.Now().Unix(),
 		jwt.StandardClaims{
 			NotBefore: time.Now().Unix(),
 			ExpiresAt: time.Now().Unix() + 60*60*24*14,
-			Issuer:    "Fl0RencEss",
+			Issuer:    "Fl0RencEss", //签发者
 		},
 	}
 	AcTokenByte := jwt.NewWithClaims(jwt.SigningMethodHS256, AcTokenPre)

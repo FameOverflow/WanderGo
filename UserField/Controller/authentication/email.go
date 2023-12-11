@@ -61,6 +61,7 @@ func CompareCaptcha(captcha int,Account string) bool {
 	var TempCaptcha UserCaptcha
 	conf.GLOBAL_DB.Model(&UserCaptcha{}).Where("user_account = ?",Account).First(&TempCaptcha)
 	if TempCaptcha.Captcha == captcha && TempCaptcha.ExpireTime >= time.Now().Unix(){
+		conf.GLOBAL_DB.Delete(&TempCaptcha)
 		return true
 	}
 	return false

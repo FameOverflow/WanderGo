@@ -11,6 +11,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // 处理前端的注册请求,前端设置一下发送完验证码才能点击注册
@@ -24,18 +25,26 @@ func RegisterHandler(ctx *gin.Context) {
 		log.Printf("err: %v\n", err)
 		return
 	}
-	registerAcct.UserPassword = util.EncryptMd5(registerAcct.UserPassword)
-	if CompareCaptcha(registerAcct.UserCaptcha,registerAcct.UserAccount) {
+	// 密码哈希化
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(registerAcct.UserPassword), bcrypt.DefaultCost)
+	if err != nil {
+		log.Printf("err: %v\n", err)
+	}
+	registerAcct.UserPassword = string(hashedPassword)
+
+	if CompareCaptcha(registerAcct.UserCaptcha, registerAcct.UserAccount) {
 		con.GLOBAL_DB.Model(&con.User{}).Create(&registerAcct)
 		token := util.GetToken(registerAcct.UserAccount)
-		ctx.SetCookie("_token", "Bearer "+token, 2592000, "/", "localhost", false, true)
-		ctx.Request.Header.Set("Authorization", "Bearer "+token)
+		BearerToken := "Bearer " + token
+		ctx.SetCookie("_token", "Bearer "+token, 2592000, "/", "localhost", true, true)
+		ctx.Request.Header.Set("Authorization", BearerToken)
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "注册成功",
 		})
 	} else {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"message": "验证码错误，或者已过期",
+			"error":   err.Error(),
 		})
 	}
 }
@@ -63,11 +72,10 @@ func LoginHandler(ctx *gin.Context) {
 	}
 	token := util.GetToken(loginAcct.UserAccount)
 	BearerToken := "Bearer " + token
-	ctx.SetCookie("_token", BearerToken, 2592000, "/", "localhost", false, true)
+	ctx.SetCookie("_token", BearerToken, 2592000, "/", "localhost", true, true)
 	ctx.Request.Header.Set("Authorization", BearerToken)
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "登录成功",
-		"token":   BearerToken,
 	})
 }
 
@@ -91,7 +99,7 @@ func RetrievePasswordCaptcha(ctx *gin.Context) {
 		log.Println(err)
 		return
 	}
-	SendCaptcha(ctx,u.UserAccount,"慢漫找回密码")
+	SendCaptcha(ctx, u.UserAccount, "慢漫找回密码")
 }
 
 func RetrievePassword(ctx *gin.Context) {
@@ -104,7 +112,7 @@ func RetrievePassword(ctx *gin.Context) {
 		log.Println(err)
 		return
 	}
-	if CompareCaptcha(u.UserCaptcha,u.UserAccount) {
+	if CompareCaptcha(u.UserCaptcha, u.UserAccount) {
 		con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", u.UserAccount).Select("user_password").Updates(con.User{UserPassword: util.EncryptMd5(u.NewPwd)})
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "您已成功修改密码,请登录",
