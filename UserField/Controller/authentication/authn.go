@@ -3,19 +3,14 @@ package Authentication
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
-	"regexp"
-	"strconv"
 	"strings"
-	"time"
 
 	con "SparkForge/configs"
 	util "SparkForge/util"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	mailer "gopkg.in/gomail.v2"
 )
 
 // 处理前端的注册请求,前端设置一下发送完验证码才能点击注册
@@ -43,7 +38,6 @@ func RegisterHandler(ctx *gin.Context) {
 			"message": "验证码错误，或者已过期",
 		})
 	}
-
 }
 
 // 处理前端的登录请求
@@ -87,7 +81,7 @@ func ExitHandler(ctx *gin.Context) {
 }
 
 // 找回密码前先发获取验证码
-func ForgotPasswordGetCaptcha(ctx *gin.Context) {
+func RetrievePasswordCaptcha(ctx *gin.Context) {
 	var u UserForgottenPre
 	err := ctx.ShouldBind(&u)
 	if err != nil {
@@ -97,33 +91,10 @@ func ForgotPasswordGetCaptcha(ctx *gin.Context) {
 		log.Println(err)
 		return
 	}
-	realEmail := regexp.MustCompile("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$")
-	if !realEmail.MatchString(u.UserAccount) {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "请输入正确的邮箱地址",
-		})
-		return
-	}
-	msg := mailer.NewMessage()
-	TempCaptcha.Captcha = rand.Intn(900000) + 100000
-	TempCaptcha.UserAccount = u.UserAccount
-	TempCaptcha.ExpireTime=time.Now().Add(10 * time.Minute).Unix()
-	randNum := strconv.Itoa(TempCaptcha.Captcha)
-	msg.SetHeader("From", con.EMConfig.UserName)
-	msg.SetHeader("To", u.UserAccount)
-	msg.SetHeader("Subject", "慢漫找回验证码")
-	msg.SetBody("text/html", "<p>您正在找回慢漫密码，以下是您的验证码，验证码将在十分钟后过期<p><h2>"+randNum+"<h2><p>如果这不是您的邮件请忽略，很抱歉打扰您，请原谅。<p>")
-	dialer := mailer.NewDialer(con.EMConfig.Host, con.EMConfig.Port, con.DBconfig.Username, con.EMConfig.Password) //这个授权码随便用，刚创的
-	if err := dialer.DialAndSend(msg); err != nil {
-		log.Println(err)
-		return
-	}
-	con.GLOBAL_DB.Model(&UserCaptcha{}).Create(&TempCaptcha)
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "验证码已发送",
-	})
+	SendCaptcha(ctx,u.UserAccount,"慢漫找回密码")
 }
-func ForgotPassword(ctx *gin.Context) {
+
+func RetrievePassword(ctx *gin.Context) {
 	var u UserForgotten
 	err := ctx.ShouldBind(&u)
 	if err != nil {
@@ -142,7 +113,6 @@ func ForgotPassword(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "验证码错误",
 		})
-		fmt.Println(TempCaptcha)
 	}
 
 }
