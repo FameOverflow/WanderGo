@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	con "SparkForge/configs"
 	util "SparkForge/util"
@@ -29,7 +30,7 @@ func RegisterHandler(ctx *gin.Context) {
 		return
 	}
 	registerAcct.UserPassword = util.EncryptMd5(registerAcct.UserPassword)
-	if CompareCaptcha(registerAcct.UserCaptcha) {
+	if CompareCaptcha(registerAcct.UserCaptcha,registerAcct.UserAccount) {
 		con.GLOBAL_DB.Model(&con.User{}).Create(&registerAcct)
 		token := util.GetToken(registerAcct.UserAccount)
 		ctx.SetCookie("_token", "Bearer "+token, 2592000, "/", "localhost", false, true)
@@ -39,7 +40,7 @@ func RegisterHandler(ctx *gin.Context) {
 		})
 	} else {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"message": "验证码错误",
+			"message": "验证码错误，或者已过期",
 		})
 	}
 
@@ -104,17 +105,20 @@ func ForgotPasswordGetCaptcha(ctx *gin.Context) {
 		return
 	}
 	msg := mailer.NewMessage()
-	TempCaptcha = rand.Intn(900000) + 100000
-	randNum := strconv.Itoa(TempCaptcha)
+	TempCaptcha.Captcha = rand.Intn(900000) + 100000
+	TempCaptcha.UserAccount = u.UserAccount
+	TempCaptcha.ExpireTime=time.Now().Add(10 * time.Minute).Unix()
+	randNum := strconv.Itoa(TempCaptcha.Captcha)
 	msg.SetHeader("From", con.EMConfig.UserName)
 	msg.SetHeader("To", u.UserAccount)
-	msg.SetHeader("Subject", "您的慢漫验证码")
-	msg.SetBody("text/html", "<h3>您的慢漫验证码为</h3><p>"+randNum+"<p>")
+	msg.SetHeader("Subject", "慢漫找回验证码")
+	msg.SetBody("text/html", "<p>您正在找回慢漫密码，以下是您的验证码，验证码将在十分钟后过期<p><h2>"+randNum+"<h2><p>如果这不是您的邮件请忽略，很抱歉打扰您，请原谅。<p>")
 	dialer := mailer.NewDialer(con.EMConfig.Host, con.EMConfig.Port, con.DBconfig.Username, con.EMConfig.Password) //这个授权码随便用，刚创的
 	if err := dialer.DialAndSend(msg); err != nil {
 		log.Println(err)
 		return
 	}
+	con.GLOBAL_DB.Model(&UserCaptcha{}).Create(&TempCaptcha)
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "验证码已发送",
 	})
@@ -129,7 +133,7 @@ func ForgotPassword(ctx *gin.Context) {
 		log.Println(err)
 		return
 	}
-	if CompareCaptcha(u.UserCaptcha) {
+	if CompareCaptcha(u.UserCaptcha,u.UserAccount) {
 		con.GLOBAL_DB.Model(&con.User{}).Where("user_account = ?", u.UserAccount).Select("user_password").Updates(con.User{UserPassword: util.EncryptMd5(u.NewPwd)})
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "您已成功修改密码,请登录",

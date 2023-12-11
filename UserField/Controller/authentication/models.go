@@ -31,3 +31,9 @@ type CommentsPayload struct {
 	PlaceUID    uint   `gorm:"not null" json:"place_uid"`
 	StarCnt     int    `gorm:"not null" json:"star_cnt"`
 }
+
+type UserCaptcha struct {
+	Captcha int `json:"captcha"`
+	UserAccount string `json:"user_account"`
+	ExpireTime int64 `json:"expire_time"`
+}
